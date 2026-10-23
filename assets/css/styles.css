@@ -371,7 +371,7 @@ table.spec tr:last-child td { border-bottom: 0; }
 }
 @media (min-width: 800px) { .footer-grid { grid-template-columns: 1.4fr 1fr 1fr 1fr; } }
 .footer-brand strong { font-family: var(--display); font-size: 1.4rem; color: #fff; display: block; }
-.footer-col h3 { color: #fff; font-size: 1rem; margin-bottom: .75rem; font-family: var(--font); letter-spacing: .06em; text-transform: uppercase; }
+.footer-col h3, .footer-col .footer-h { color: #fff; font-size: 1rem; margin-bottom: .75rem; font-family: var(--font); letter-spacing: .06em; text-transform: uppercase; }
 .footer-col ul { list-style: none; padding: 0; margin: 0; display: grid; gap: .45rem; }
 .footer-bottom {
   margin-top: 2rem; padding-top: 1.25rem; border-top: 1px solid rgba(255,255,255,.12);
@@ -457,3 +457,6 @@ table.spec tr:last-child td { border-bottom: 0; }
   .lightbox__prev, .lightbox__next { top: auto; bottom: 1rem; transform: none; }
 }
 body.lightbox-open { overflow: hidden; }
+.faq-item { border-bottom: 1px solid var(--line); padding: .9rem 0; }
+.faq-item summary { cursor: pointer; font-weight: 600; }
+.faq-item p { margin: .6rem 0 0; }
