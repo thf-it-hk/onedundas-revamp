@@ -1,0 +1,21 @@
+[
+  {
+    "active": true,
+    "title_en": "Early Bird Special: up to 8% off monthly packages",
+    "title_zh": "限時早鳥優惠：月租計劃專享高達 8% 折扣",
+    "summary_en": "Book by 30 November 2026 and quote the code for up to 8% off. Call leasing for details.",
+    "summary_zh": "於 2026年11月30日前預訂，並提供折扣碼即可享高達 8% 折扣。詳情請聯絡租務部。",
+    "description_en": "Enjoy exclusive savings with our early bird offer! Book any designated monthly stay plan on or before 30 November 2026 and quote the promo code to receive up to 8% discount. Limited availability!",
+    "description_zh": "把握限時禮遇！由即日起至2026年11月30日前預訂指定月租計劃，並於預訂時提供折扣碼，即可尊享高達 8% 租金折扣。名額有限！",
+    "code": "BOOKEARLY",
+    "discount_label_en": "Up to 8% off",
+    "discount_label_zh": "高達 8% 折扣",
+    "valid_from": "",
+    "valid_until": "2026-11-30",
+    "terms_en": "<ul><li>Discount applies to leases commencing between 1 January 2027 and 30 June 2027.</li><li>Cannot be used in conjunction with any other promotions.</li><li>For enquiries, contact Leasing at +852 2700 1122 or leasing@onedundashk.com.</li></ul>",
+    "terms_zh": "<ul><li>此優惠適用於租期由2027年1月1日至2027年6月30日期間起租的合約。</li><li>此優惠不能與其他推廣優惠同時使用。</li><li>如欲查詢，請致電 +852 2700 1122 或電郵 leasing@onedundashk.com 與租務部聯絡。</li></ul>",
+    "image": "/assets/images/promotions/early-bird.jpg",
+    "image_alt": "Early Bird promotion: up to 8% off monthly packages",
+    "book_link": ""
+  }
+]

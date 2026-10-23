@@ -169,6 +169,9 @@ def page(title_en, title_zh, desc, body, name="index.html", crumb="Home", noinde
                   "breadcrumb": {"@id": url + "#breadcrumb"}})
     if name == "contact.html":
         graph.append(FAQ_LD)
+    if name == "promotion.html" and promo_offers_ld():
+        graph.append({"@type": "OfferCatalog", "@id": url + "#offers", "name": "One Dundas promotions",
+                      "itemListElement": promo_offers_ld()})
     ld = json.dumps({"@context": "https://schema.org", "@graph": graph}, ensure_ascii=False, indent=1).replace("</", "<\\/")
     seo.append(f'  <script type="application/ld+json">\n{ld}\n  </script>')
     preload = ''
@@ -236,6 +239,159 @@ AVAIL = f'''
 '''
 
 # ===================== INDEX =====================
+
+# ===================== PROMOTIONS (data: content/promotions.json, edited via Pages CMS) =====================
+import html as _html
+import os as _os
+from datetime import date as _date
+
+BUILD_DATE = _date.fromisoformat(_os.environ["BUILD_DATE"]) if _os.environ.get("BUILD_DATE") else _date.today()
+
+def _d(v):
+    try:
+        return _date.fromisoformat(str(v)[:10]) if v else None
+    except ValueError:
+        return None
+
+def _load_promos():
+    f = ROOT / "content" / "promotions.json"
+    data = json.loads(f.read_text(encoding="utf-8")) if f.exists() else []
+    out = []
+    for p in data or []:
+        if not p.get("active"):
+            continue
+        vf, vu = _d(p.get("valid_from")), _d(p.get("valid_until"))
+        if vf and vf > BUILD_DATE: continue
+        if vu and vu < BUILD_DATE: continue
+        out.append(p)
+    return out
+
+PROMOS = _load_promos()
+E = lambda v: _html.escape(str(v or ""))
+
+def _img(p):
+    im = (p.get("image") or "").lstrip("/")
+    return im
+
+def _tx(p, k):
+    return t(E(p.get(k + "_en")), E(p.get(k + "_zh") or p.get(k + "_en")))
+
+def _code(p):
+    return f'<p>{t("Promo code:", "折扣碼：")} <span class="promo-code">{E(p["code"])}</span></p>' if p.get("code") else ""
+
+def _date_line(p):
+    vu = _d(p.get("valid_until"))
+    if not vu: return ""
+    return f'<p><small>{t("Valid until " + vu.strftime("%-d %B %Y"), "優惠期至 " + f"{vu.year}年{vu.month}月{vu.day}日")}</small></p>'
+
+def _home_promo():
+    if not PROMOS:
+        return ""
+    p = PROMOS[0]
+    im = _img(p)
+    img = f'<div><img src="{E(im)}" alt="{E(p.get("image_alt") or p.get("title_en"))}" style="border-radius:12px;width:100%;object-fit:cover;max-height:220px"></div>' if im else ""
+    summ = _tx(p, "summary") if p.get("summary_en") else _tx(p, "description")
+    return f"""<section class="section">
+  <div class="container">
+    <div class="promo-banner">
+      <div>
+        <p class="eyebrow" style="color:#f5d9ff">{_tx(p, "discount_label") if p.get("discount_label_en") else t("Limited offer", "限時優惠")}</p>
+        <h2>{_tx(p, "title")}</h2>
+        <p>{summ}</p>
+        {_code(p)}
+        <div class="btn-row">
+          <a class="btn btn--light" href="promotion.html">{t("View promotion", "查看推廣")}</a>
+          <a class="btn btn--ghost" style="border-color:#fff;color:#fff" href="tel:+85227001122">+852 2700 1122</a>
+        </div>
+      </div>
+      {img}
+    </div>
+  </div>
+</section>"""
+
+def _promo_card(p):
+    im = _img(p)
+    img = f'<div><img src="{E(im)}" alt="{E(p.get("image_alt") or p.get("title_en"))}" style="border-radius:12px;width:100%"></div>' if im else ""
+    link = E(p.get("book_link") or BOOK)
+    terms = ""
+    if p.get("terms_en") or p.get("terms_zh"):
+        terms = f"""<div style="margin-top:2.5rem;max-width:48rem" class="feature-list">
+      <h2>{t("Terms & conditions", "條款與細則")}</h2>
+      {t(p.get("terms_en") or "", p.get("terms_zh") or p.get("terms_en") or "")}
+    </div>"""
+    return f"""<div class="promo-banner" style="margin-bottom:2rem">
+      <div>
+        {('<p class="eyebrow" style="color:#f5d9ff">' + _tx(p, "discount_label") + '</p>') if p.get("discount_label_en") else ""}
+        <h2>{_tx(p, "title")}</h2>
+        <p>{_tx(p, "description")}</p>
+        {_code(p)}
+        {_date_line(p)}
+        <div class="btn-row">
+          <a class="btn btn--light" href="{link}" data-book-now target="_blank" rel="noopener noreferrer">{t("Book Now", "立即預訂")}</a>
+          <a class="btn btn--ghost" style="border-color:#fff;color:#fff" href="tel:+85227001122">{t("Call leasing", "致電租務部")}</a>
+        </div>
+      </div>
+      {img}
+    </div>
+    {terms}"""
+
+if PROMOS:
+    _cards = "\n    ".join(_promo_card(p) for p in PROMOS)
+else:
+    _cards = f"""<div style="max-width:48rem">
+      <h2>{t("No current promotions", "暫時未有推廣優惠")}</h2>
+      <p>{t("There are no promotions running at the moment. Please check back soon, or contact Leasing at +852 2700 1122 or leasing@onedundashk.com for our latest rates.", "目前未有推廣優惠，敬請留意。如欲查詢最新租金，請致電 +852 2700 1122 或電郵 leasing@onedundashk.com 與租務部聯絡。")}</p>
+      <div class="btn-row"><a class="btn btn--accent" href="{BOOK}" data-book-now target="_blank" rel="noopener noreferrer">{t("Book Now", "立即預訂")}</a></div>
+    </div>"""
+
+PROMO_PAGE = f"""
+<section class="page-hero">
+  <div class="container">
+    <p class="eyebrow">{t("Promotion", "推廣活動")}</p>
+    <h1>{t("Current offers", "最新優惠")}</h1>
+  </div>
+</section>
+<section class="section">
+  <div class="container">
+    {_cards}
+  </div>
+</section>
+"""
+HOME_PROMO = _home_promo()
+
+def _strip(h):
+    return re.sub(r"<[^>]+>", " ", h or "").split()
+
+def promo_offers_ld():
+    out = []
+    for p in PROMOS:
+        o = {"@type": "Offer", "name": p.get("title_en"), "description": p.get("description_en"),
+             "url": SITE_URL + "promotion.html", "seller": {"@id": SITE_URL + "#organization"}}
+        if p.get("valid_from"): o["validFrom"] = str(p["valid_from"])[:10]
+        if p.get("valid_until"): o["validThrough"] = str(p["valid_until"])[:10]
+        out.append(o)
+    return out
+
+def promo_llms():
+    if not PROMOS:
+        return "- Current offer: none at the moment (contact leasing for latest rates)"
+    lines = []
+    for p in PROMOS:
+        bits = [p.get("title_en", "")]
+        if p.get("code"): bits.append(f"code {p['code']}")
+        if p.get("valid_until"): bits.append(f"valid until {str(p['valid_until'])[:10]}")
+        terms = " ".join(_strip(p.get("terms_en")))
+        lines.append("- Current offer: " + "; ".join(bits) + (f". {terms}" if terms else ""))
+    return "\n".join(lines)
+
+if PROMOS:
+    _p0 = PROMOS[0]
+    PROMO_TITLE = f"{_p0.get('title_en')} | One Dundas"
+    PROMO_DESC = " ".join((_p0.get("description_en") or "").split())[:155] + (f" Code {_p0['code']}." if _p0.get("code") else "")
+else:
+    PROMO_TITLE = "Promotions | One Dundas Serviced Apartments"
+    PROMO_DESC = "Current promotions and offers at One Dundas serviced apartments, Mongkok. Contact leasing for the latest rates."
+
 index_body = f'''
 <section class="hero">
   <div class="hero__media" style="background-image:url('assets/images/hero-lobby.jpg')" role="img" aria-label="One Dundas lobby"></div>
@@ -251,24 +407,7 @@ index_body = f'''
   </div>
 </section>
 
-<section class="section">
-  <div class="container">
-    <div class="promo-banner">
-      <div>
-        <p class="eyebrow" style="color:#f5d9ff">{t("Limited offer", "限時優惠")}</p>
-        <h2>{t("Early Bird: up to 8% off monthly packages", "早鳥優惠：月租計劃高達 8% 折扣")}</h2>
-        <p>{t("Book by 30 November 2026 and quote", "於 2026年11月30日前預訂，並提供折扣碼")} <span class="promo-code">BOOKEARLY</span> {t("for up to 8% off. Call leasing for details.", "即可享高達 8% 折扣。詳情請聯絡租務部。")}</p>
-        <div class="btn-row">
-          <a class="btn btn--light" href="promotion.html">{t("View promotion", "查看推廣")}</a>
-          <a class="btn btn--ghost" style="border-color:#fff;color:#fff" href="tel:+85227001122">+852 2700 1122</a>
-        </div>
-      </div>
-      <div>
-        <img src="assets/images/promo.jpg" alt="One Dundas Early Bird promotion" style="border-radius:12px;width:100%;object-fit:cover;max-height:220px">
-      </div>
-    </div>
-  </div>
-</section>
+{HOME_PROMO}
 
 <section class="section section--tint">
   <div class="container">
@@ -555,39 +694,7 @@ location_body = f'''
 '''
 
 # ===================== PROMOTION =====================
-promo_body = f'''
-<section class="page-hero">
-  <div class="container">
-    <p class="eyebrow">{t("Promotion", "推廣活動")}</p>
-    <h1>{t("Current offers", "最新優惠")}</h1>
-  </div>
-</section>
-<section class="section">
-  <div class="container">
-    <div class="promo-banner">
-      <div>
-        <h2>{t("Early Bird Special: up to 8% off monthly packages", "限時早鳥優惠：月租計劃專享高達 8% 折扣")}</h2>
-        <p>{t("Enjoy exclusive savings with our early bird offer! Book any designated monthly stay plan on or before 30 November 2026 and quote the promo code", "把握限時禮遇！由即日起至2026年11月30日前預訂指定月租計劃，並於預訂時提供折扣碼")} <span class="promo-code">BOOKEARLY</span> {t("to receive up to 8% discount. Limited availability!", "即可尊享高達 8% 租金折扣。名額有限！")}</p>
-        <div class="btn-row">
-          <a class="btn btn--light" href="{BOOK}" data-book-now target="_blank" rel="noopener noreferrer">{t("Book Now", "立即預訂")}</a>
-          <a class="btn btn--ghost" style="border-color:#fff;color:#fff" href="tel:+85227001122">{t("Call leasing", "致電租務部")}</a>
-        </div>
-      </div>
-      <div>
-        <img src="assets/images/promo.jpg" alt="Early Bird promotion: up to 8% off monthly packages" style="border-radius:12px;width:100%">
-      </div>
-    </div>
-    <div style="margin-top:2.5rem;max-width:48rem">
-      <h2>{t("Terms & conditions", "條款與細則")}</h2>
-      <ul class="feature-list">
-        <li>{t("Discount applies to leases commencing between 1 January 2027 and 30 June 2027.", "此優惠適用於租期由2027年1月1日至2027年6月30日期間起租的合約。")}</li>
-        <li>{t("Cannot be used in conjunction with any other promotions.", "此優惠不能與其他推廣優惠同時使用。")}</li>
-        <li>{t("For enquiries, contact Leasing at +852 2700 1122 or leasing@onedundashk.com.", "如欲查詢，請致電 +852 2700 1122 或電郵 leasing@onedundashk.com 與租務部聯絡。")}</li>
-      </ul>
-    </div>
-  </div>
-</section>
-'''
+promo_body = PROMO_PAGE
 
 # ===================== GALLERY =====================
 GALLERY_IMGS = [
@@ -900,8 +1007,7 @@ PAGES = [
      "Compare One Dundas apartments: Studio 249–280 sq ft, One-Bedroom 437–479 sq ft, Two-Bedroom 544 sq ft, with kitchenette and 4K smart TV.", accom_body),
     ("location.html", "Location", "Location & Transport near Mongkok MTR | One Dundas", "位置 | 壹登",
      "Map and directions to One Dundas, 1 Dundas Street, Mongkok — walking times to Mongkok and Yau Ma Tei MTR, shopping, banks and universities.", location_body),
-    ("promotion.html", "Promotion", "Early Bird Offer – Up to 8% Off Monthly Stays | One Dundas", "推廣 | 壹登",
-     "Book a monthly stay plan at One Dundas by 30 November 2026 with code BOOKEARLY for up to 8% off. Terms apply.", promo_body),
+    ("promotion.html", "Promotion", PROMO_TITLE, "推廣 | 壹登", PROMO_DESC, promo_body),
     ("gallery.html", "Gallery", "Photo Gallery | One Dundas Serviced Apartments", "相片集 | 壹登",
      "Photos of One Dundas Studio, One-Bedroom and Two-Bedroom interiors, lobby, building exterior, gym and leisure area.", gallery_body),
     ("virtual-tour.html", "Virtual Tour", "360° Virtual Tour of Apartments | One Dundas", "虛擬導覽 | 壹登",
@@ -941,7 +1047,7 @@ faq_md = "\n".join(f"- **{q}** {a}" for q, a, _, _ in FAQS)
 - Housekeeping twice weekly (except Sundays), linen weekly; outdoor gym & leisure area; self-service laundry; BBQ and car park rental; 24/7 concierge & security; non-smoking
 - Transport: ~8 min walk to Mongkok MTR Exit E1 / Langham Place; ~6 min to Yau Ma Tei MTR Exit A1
 - Direct booking: {BOOK}
-- Current offer: code BOOKEARLY, up to 8% off designated monthly plans booked by 30 Nov 2026 (leases starting 1 Jan–30 Jun 2027)
+{promo_llms()}
 
 ## Pages
 {links}

@@ -1,0 +1,29 @@
+media:
+  input: assets/images/promotions
+  output: /assets/images/promotions
+  categories: [image]
+content:
+  - name: promotions
+    label: "Promotions 推廣優惠"
+    type: file
+    path: content/promotions.json
+    format: json
+    list: true
+    fields:
+      - { name: active, label: "Show on website 顯示於網站", type: boolean, default: true, description: "Untick to hide 取消剔選即隱藏" }
+      - { name: title_en, label: "Title (English) 標題（英文）", type: string, required: true }
+      - { name: title_zh, label: "Title (Chinese) 標題（中文）", type: string, required: true }
+      - { name: summary_en, label: "Home page teaser (English) 首頁簡介（英文）", type: text }
+      - { name: summary_zh, label: "Home page teaser (Chinese) 首頁簡介（中文）", type: text }
+      - { name: description_en, label: "Description (English) 詳情（英文）", type: text }
+      - { name: description_zh, label: "Description (Chinese) 詳情（中文）", type: text }
+      - { name: code, label: "Promo code 折扣碼", type: string, description: "Optional 可留空" }
+      - { name: discount_label_en, label: "Discount label (English) 折扣標籤（英文）", type: string, description: "e.g. Up to 8% off" }
+      - { name: discount_label_zh, label: "Discount label (Chinese) 折扣標籤（中文）", type: string, description: "例：高達 8% 折扣" }
+      - { name: valid_from, label: "Valid from 開始日期", type: date, description: "Optional; hidden before this date 可留空；此日期前不顯示" }
+      - { name: valid_until, label: "Valid until 截止日期", type: date, description: "Hidden automatically after this date 過期後自動隱藏" }
+      - { name: terms_en, label: "Terms & conditions (English) 條款（英文）", type: rich-text }
+      - { name: terms_zh, label: "Terms & conditions (Chinese) 條款（中文）", type: rich-text }
+      - { name: image, label: "Image 圖片", type: image, description: "Optional 可留空" }
+      - { name: image_alt, label: "Image description 圖片說明", type: string }
+      - { name: book_link, label: "Booking link 預訂連結", type: string, description: "Optional; blank = default booking engine 留空即用預設預訂連結" }
