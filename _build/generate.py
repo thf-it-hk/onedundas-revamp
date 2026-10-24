@@ -8,6 +8,11 @@ BOOK = "https://book-directonline.com/properties/OneDundasDirect/"
 # Canonical production base (single source of truth). GitHub Pages preview canonicalises here.
 SITE_URL = "https://onedundashk.com/"
 OG_IMAGE = "assets/images/exterior-day.jpg"
+# Web3Forms enquiry form (public access key, safe client-side).
+WEB3FORMS_ACCESS_KEY = "0ca60608-4cab-4d0d-91c8-55cbe55573c1"
+WEB3FORMS_ENDPOINT = "https://api.web3forms.com/submit"
+# No-JS fallback redirect after POST. Update to SITE_URL + "contact.html#thank-you" at DNS cutover.
+ENQUIRY_REDIRECT = "https://thf-it-hk.github.io/onedundas-revamp/contact.html#thank-you"
 import re
 try:
     from PIL import Image
@@ -785,12 +790,18 @@ contact_body = f'''
 <section class="section">
   <div class="container grid-2" style="align-items:start">
     <div class="form-card">
-      <div class="form-success" data-enquiry-success tabindex="-1" role="status">
-        {t("Thanks — your mail client should open with the enquiry. If it does not, please email leasing@onedundashk.com directly.", "謝謝 — 系統將開啟電郵程式載入查詢內容。如未成功，請直接電郵 leasing@onedundashk.com。")}
+      <div class="form-success" id="thank-you" data-enquiry-success tabindex="-1" role="status" aria-live="polite">
+        {t("Thank you — your enquiry has been sent. Our leasing team will be in touch shortly.", "謝謝 — 您的查詢已送出，租務團隊會盡快與您聯絡。")}
       </div>
-      <form data-enquiry-form novalidate
-            action="mailto:leasing@onedundashk.com" method="post" enctype="text/plain"
-            data-formspree-endpoint="">
+      <div class="form-error" data-enquiry-error tabindex="-1" role="alert">
+        {t('Sorry, your enquiry could not be sent. Please email <a href="mailto:leasing@onedundashk.com">leasing@onedundashk.com</a> or call <a href="tel:+85227001122">+852 2700 1122</a>.', '抱歉，查詢未能送出。請電郵 <a href="mailto:leasing@onedundashk.com">leasing@onedundashk.com</a> 或致電 <a href="tel:+85227001122">+852 2700 1122</a>。')}
+      </div>
+      <form data-enquiry-form novalidate action="{WEB3FORMS_ENDPOINT}" method="post">
+        <input type="hidden" name="access_key" value="{WEB3FORMS_ACCESS_KEY}">
+        <input type="hidden" name="subject" value="New enquiry from onedundashk.com website">
+        <input type="hidden" name="from_name" value="One Dundas Website">
+        <input type="hidden" name="redirect" value="{ENQUIRY_REDIRECT}">
+        <input type="checkbox" name="botcheck" class="visually-hidden-bot" style="display:none" tabindex="-1" autocomplete="off">
         <div class="form-grid form-grid--2">
           <div class="field">
             <label for="firstname">{t("First name *", "名字 *")}</label>
@@ -881,9 +892,7 @@ contact_body = f'''
           <input type="checkbox" name="marketing" value="yes">
           <span>{t("I would like to receive news and offers from One Dundas (optional, not pre-checked).", "我願意接收壹登的最新消息與優惠（選填，預設不勾選）。")}</span>
         </label>
-        <button class="btn btn--primary btn--block" type="submit">{t("Send enquiry", "送出查詢")}</button>
-        <!-- Enquiry uses mailto to leasing@onedundashk.com (see README).
-             To wire Formspree later: set data-formspree-endpoint="https://formspree.io/f/xxxx" on this form. -->
+        <button class="btn btn--primary btn--block" type="submit" data-enquiry-submit><span data-label-idle>{t("Send enquiry", "送出查詢")}</span><span data-label-sending hidden>{t("Sending…", "傳送中…")}</span></button>
       </form>
     </div>
     <div class="contact-stack">

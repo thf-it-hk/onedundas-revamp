@@ -79,8 +79,11 @@ Plain “Book Now” buttons open the same base URL; if an availability form is 
 - Fields aligned with the old site: first/last name, company, phone, email, adults/children, budget, apartment type, arrival/departure, remarks, how-heard
 - Marketing opt-in checkbox **not** pre-checked
 - Client-side validation
-- Submit: progressive enhancement via `mailto:leasing@onedundashk.com` with a composed body
-- To wire Formspree later: set `data-formspree-endpoint="https://formspree.io/f/xxxx"` on the `<form data-enquiry-form>`
+- Submit: [Web3Forms](https://web3forms.com) — `POST https://api.web3forms.com/submit`
+  - Access key (public, client-safe) is the single constant `WEB3FORMS_ACCESS_KEY` in `_build/generate.py`
+  - Hidden fields: `access_key`, `subject` ("New enquiry from onedundashk.com website"), `from_name` ("One Dundas Website"), `redirect`, plus honeypot `botcheck` (hidden checkbox)
+  - With JS: `assets/js/main.js` validates, then sends all fields as JSON via `fetch` (adds `name` and `replyto` = visitor email), disables the button while sending, and shows inline EN/繁中 success or error (error falls back to leasing@onedundashk.com / +852 2700 1122)
+  - Without JS: normal form POST; Web3Forms redirects to `ENQUIRY_REDIRECT` (`contact.html#thank-you`). Update that constant to the production URL at DNS cutover
 
 Primary leasing contact used throughout: **+852 2700 1122** / **leasing@onedundashk.com**
 
@@ -121,7 +124,7 @@ python3 _build/generate.py
 
 1. **Virtual tour embeds** — old WP page had no working Matterport/iframe URLs; page links to gallery + enquiry. Drop in embed URLs when available.
 2. **Privacy / Disclaimer** — simplified stubs; replace with counsel-approved full text before production cutover.
-3. **Enquiry backend** — mailto for now; add Formspree (or similar) endpoint when ready.
+3. **Enquiry backend** — Web3Forms (see Enquiry form). Update `ENQUIRY_REDIRECT` at cutover.
 4. **News / Media Room CMS** — gallery only; no news posts (would need a static content folder or headless CMS).
 5. **Do not point DNS** at this build until content sign-off; production `onedundashk.com` is untouched.
 6. **Verify SiteMinder date params** on a test booking with real check-in/out dates.

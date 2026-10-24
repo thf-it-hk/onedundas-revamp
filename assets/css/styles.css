@@ -351,7 +351,14 @@ table.spec tr:last-child td { border-bottom: 0; }
   display: none; background: #e8f7ef; border: 1px solid #b7e4c7; color: var(--ok);
   border-radius: 10px; padding: 1rem; margin-bottom: 1rem;
 }
-.form-success.is-visible { display: block; }
+.form-success.is-visible, .form-success:target { display: block; }
+.form-error {
+  display: none; background: #fdecec; border: 1px solid #f5c2c2; color: #9b1c1c;
+  border-radius: 10px; padding: 1rem; margin-bottom: 1rem;
+}
+.form-error.is-visible { display: block; }
+.form-error a { color: inherit; text-decoration: underline; }
+button[disabled][aria-busy="true"] { opacity: .7; cursor: wait; }
 .form-note { font-size: .9rem; color: var(--ink-muted); margin-top: 1rem; }
 
 .contact-stack { display: grid; gap: 1rem; }

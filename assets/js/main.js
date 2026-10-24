@@ -2,7 +2,6 @@
   "use strict";
 
   var BOOK_BASE = "https://book-directonline.com/properties/OneDundasDirect/";
-  var ENQUIRY_EMAIL = "leasing@onedundashk.com";
   var STORAGE_LANG = "onedundas-lang";
 
   function $(sel, root) {
@@ -312,57 +311,65 @@
       var marketing = form.querySelector('[name="marketing"]');
       var marketingYes = marketing && marketing.checked;
 
-      var subject = "One Dundas Enquiry — " + firstname + " " + lastname + " (" + apartment + ")";
-      var body = [
-        "One Dundas Enquiry / 壹登查詢",
-        "----------------------------",
-        "Name / 姓名: " + firstname + " " + lastname,
-        "Company / 公司: " + (company || "—"),
-        "Phone / 電話: " + phone,
-        "Email / 電郵: " + email,
-        "Adults / 成人: " + (adult || "—"),
-        "Children / 小童: " + (child || "—"),
-        "Budget / 預算: " + (budget || "—"),
-        "Apartment type / 公寓類型: " + apartment,
-        "Arrival / 入住: " + adate,
-        "Departure / 退房: " + ddate,
-        "How heard / 得知途徑: " + (hear || "—"),
-        "Marketing opt-in / 接收推廣: " + (marketingYes ? "Yes" : "No"),
-        "",
-        "Message / 留言:",
-        remark || "—"
-      ].join("\r\n");
-
-      // Progressive enhancement: mailto (no backend). Formspree can replace later.
-      var mailto = "mailto:" + ENQUIRY_EMAIL +
-        "?subject=" + encodeURIComponent(subject) +
-        "&body=" + encodeURIComponent(body);
-
       var success = $("[data-enquiry-success]");
-      if (success) {
-        success.classList.add("is-visible");
-        success.focus && success.focus();
+      var errorBox = $("[data-enquiry-error]");
+      var btn = form.querySelector("[data-enquiry-submit]");
+      if (success) success.classList.remove("is-visible");
+      if (errorBox) errorBox.classList.remove("is-visible");
+
+      var payload = {};
+      Array.prototype.forEach.call(form.elements, function (el) {
+        if (!el.name || el.name === "redirect") return;
+        if (el.type === "checkbox") {
+          if (el.name === "botcheck") { if (el.checked) payload.botcheck = true; return; }
+          payload[el.name] = el.checked ? "yes" : "no";
+          return;
+        }
+        payload[el.name] = (el.value || "").trim();
+      });
+      payload.name = firstname + " " + lastname;
+      payload.replyto = email;
+
+      function setSending(on) {
+        if (!btn) return;
+        btn.disabled = on;
+        btn.setAttribute("aria-busy", on ? "true" : "false");
+        var idle = btn.querySelector("[data-label-idle]");
+        var sending = btn.querySelector("[data-label-sending]");
+        if (idle) idle.hidden = on;
+        if (sending) sending.hidden = !on;
+      }
+      function show(box) {
+        if (!box) return;
+        box.classList.add("is-visible");
+        if (box.focus) box.focus();
       }
 
-      // Open mail client; also keep a Formspree-ready data attribute for future wiring
-      window.location.href = mailto;
-
-      // Optional: if data-formspree-endpoint is set later, POST JSON instead
-      var endpoint = form.getAttribute("data-formspree-endpoint");
-      if (endpoint) {
-        var payload = {
-          firstname: firstname, lastname: lastname, company: company,
-          phone: phone, email: email, adult: adult, child: child,
-          budget: budget, apartmenttype: apartment, adate: adate, ddate: ddate,
-          remark: remark, hear: hear, marketing: marketingYes
-        };
-        fetch(endpoint, {
-          method: "POST",
-          headers: { "Content-Type": "application/json", Accept: "application/json" },
-          body: JSON.stringify(payload)
-        }).catch(function () { /* mailto already fired */ });
-      }
+      setSending(true);
+      fetch(form.getAttribute("action"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify(payload)
+      }).then(function (res) {
+        return res.json().catch(function () { return {}; }).then(function (data) {
+          if (!res.ok || !data || data.success !== true) throw new Error((data && data.message) || "Submit failed");
+        });
+      }).then(function () {
+        form.reset();
+        if (checkIn && checkOut) setMinDates(checkIn, checkOut);
+        show(success);
+      }).catch(function () {
+        show(errorBox);
+      }).then(function () {
+        setSending(false);
+      });
     });
+
+    // No-JS POST redirects back to contact.html#thank-you
+    if (location.hash === "#thank-you") {
+      var s = $("[data-enquiry-success]");
+      if (s) s.classList.add("is-visible");
+    }
   }
 
   /* ---------- Current nav highlight ---------- */

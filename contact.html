@@ -299,12 +299,18 @@
 <section class="section">
   <div class="container grid-2" style="align-items:start">
     <div class="form-card">
-      <div class="form-success" data-enquiry-success tabindex="-1" role="status">
-        <span class="i18n-en" data-i18n-en>Thanks — your mail client should open with the enquiry. If it does not, please email leasing@onedundashk.com directly.</span><span class="i18n-zh" data-i18n-zh lang="zh-Hant">謝謝 — 系統將開啟電郵程式載入查詢內容。如未成功，請直接電郵 leasing@onedundashk.com。</span>
+      <div class="form-success" id="thank-you" data-enquiry-success tabindex="-1" role="status" aria-live="polite">
+        <span class="i18n-en" data-i18n-en>Thank you — your enquiry has been sent. Our leasing team will be in touch shortly.</span><span class="i18n-zh" data-i18n-zh lang="zh-Hant">謝謝 — 您的查詢已送出，租務團隊會盡快與您聯絡。</span>
       </div>
-      <form data-enquiry-form novalidate
-            action="mailto:leasing@onedundashk.com" method="post" enctype="text/plain"
-            data-formspree-endpoint="">
+      <div class="form-error" data-enquiry-error tabindex="-1" role="alert">
+        <span class="i18n-en" data-i18n-en>Sorry, your enquiry could not be sent. Please email <a href="mailto:leasing@onedundashk.com">leasing@onedundashk.com</a> or call <a href="tel:+85227001122">+852 2700 1122</a>.</span><span class="i18n-zh" data-i18n-zh lang="zh-Hant">抱歉，查詢未能送出。請電郵 <a href="mailto:leasing@onedundashk.com">leasing@onedundashk.com</a> 或致電 <a href="tel:+85227001122">+852 2700 1122</a>。</span>
+      </div>
+      <form data-enquiry-form novalidate action="https://api.web3forms.com/submit" method="post">
+        <input type="hidden" name="access_key" value="0ca60608-4cab-4d0d-91c8-55cbe55573c1">
+        <input type="hidden" name="subject" value="New enquiry from onedundashk.com website">
+        <input type="hidden" name="from_name" value="One Dundas Website">
+        <input type="hidden" name="redirect" value="https://thf-it-hk.github.io/onedundas-revamp/contact.html#thank-you">
+        <input type="checkbox" name="botcheck" class="visually-hidden-bot" style="display:none" tabindex="-1" autocomplete="off">
         <div class="form-grid form-grid--2">
           <div class="field">
             <label for="firstname"><span class="i18n-en" data-i18n-en>First name *</span><span class="i18n-zh" data-i18n-zh lang="zh-Hant">名字 *</span></label>
@@ -395,9 +401,7 @@
           <input type="checkbox" name="marketing" value="yes">
           <span><span class="i18n-en" data-i18n-en>I would like to receive news and offers from One Dundas (optional, not pre-checked).</span><span class="i18n-zh" data-i18n-zh lang="zh-Hant">我願意接收壹登的最新消息與優惠（選填，預設不勾選）。</span></span>
         </label>
-        <button class="btn btn--primary btn--block" type="submit"><span class="i18n-en" data-i18n-en>Send enquiry</span><span class="i18n-zh" data-i18n-zh lang="zh-Hant">送出查詢</span></button>
-        <!-- Enquiry uses mailto to leasing@onedundashk.com (see README).
-             To wire Formspree later: set data-formspree-endpoint="https://formspree.io/f/xxxx" on this form. -->
+        <button class="btn btn--primary btn--block" type="submit" data-enquiry-submit><span data-label-idle><span class="i18n-en" data-i18n-en>Send enquiry</span><span class="i18n-zh" data-i18n-zh lang="zh-Hant">送出查詢</span></span><span data-label-sending hidden><span class="i18n-en" data-i18n-en>Sending…</span><span class="i18n-zh" data-i18n-zh lang="zh-Hant">傳送中…</span></span></button>
       </form>
     </div>
     <div class="contact-stack">
