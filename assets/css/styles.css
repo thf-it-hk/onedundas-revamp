@@ -253,7 +253,10 @@ h3 { font-size: 1.45rem; }
 }
 .hero__media::after {
   content: ""; position: absolute; inset: 0;
-  background: linear-gradient(180deg, rgba(40,20,50,.25) 0%, rgba(40,20,50,.72) 70%, rgba(40,20,50,.88) 100%);
+  /* Vertical wash + soft left scrim so eyebrow/title stay readable on bright wood/marble */
+  background:
+    linear-gradient(90deg, rgba(40,20,50,.58) 0%, rgba(40,20,50,.28) 42%, transparent 68%),
+    linear-gradient(180deg, rgba(40,20,50,.38) 0%, rgba(40,20,50,.72) 70%, rgba(40,20,50,.9) 100%);
 }
 .hero__content { position: relative; z-index: 1; padding: 5rem 0 3rem; }
 .hero h1 { color: #fff; max-width: 16ch; }
@@ -265,7 +268,26 @@ html[lang="zh-Hant"] .hero h1 {
   line-break: strict;
   overflow-wrap: normal;
 }
-.hero .lead { color: rgba(255,255,255,.9); }
+/* Text over photos: solid near-white + soft shadow (WCAG-ish without heavy pills) */
+.text-on-photo,
+.hero .eyebrow,
+.hero h1,
+.hero .lead,
+.lightbox figcaption {
+  color: #fff;
+  text-shadow:
+    0 1px 2px rgba(0, 0, 0, .55),
+    0 0 18px rgba(40, 20, 50, .45);
+}
+.hero .eyebrow {
+  border-bottom-color: var(--accent);
+}
+.hero .lead {
+  color: rgba(255, 255, 255, .95);
+}
+.lightbox figcaption {
+  color: #f5f5f7;
+}
 
 /* Chinese heading wrap: prefer phrase-level breaks, not English mid-word style */
 html[lang="zh-Hant"] h1,
