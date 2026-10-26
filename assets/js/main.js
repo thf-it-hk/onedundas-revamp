@@ -39,6 +39,7 @@
       if (en && zh) titleEl.textContent = normalized === "zh-Hant" ? zh : en;
     }
     applySelectOptions(langKey);
+    refreshFlatpickrLocales();
   }
 
   function prefersChineseFromSystem() {
@@ -106,7 +107,7 @@
     });
   }
 
-  /* ---------- Date helpers ---------- */
+  /* ---------- Date helpers + Flatpickr ---------- */
   function pad(n) { return n < 10 ? "0" + n : String(n); }
 
   function toISODate(d) {
@@ -127,21 +128,82 @@
     return x;
   }
 
+  function isZhLang() {
+    return document.documentElement.lang === "zh-Hant";
+  }
+
+  function fpLocale() {
+    if (isZhLang() && window.flatpickr && flatpickr.l10ns && flatpickr.l10ns.zh_tw) {
+      return flatpickr.l10ns.zh_tw;
+    }
+    return "default";
+  }
+
+  function fpAltFormat() {
+    return isZhLang() ? "Y年m月d日" : "d/m/Y";
+  }
+
+  function setInputDate(el, d) {
+    var fp = el && el._flatpickr;
+    if (fp) {
+      fp.setDate(d, false);
+    } else if (el) {
+      el.value = toISODate(d);
+    }
+  }
+
+  function setInputMin(el, d) {
+    var fp = el && el._flatpickr;
+    if (fp) {
+      fp.set("minDate", d);
+    } else if (el) {
+      el.min = toISODate(d);
+    }
+  }
+
   function setMinDates(checkInEl, checkOutEl) {
     var today = new Date();
     today.setHours(0, 0, 0, 0);
-    checkInEl.min = toISODate(today);
+    setInputMin(checkInEl, today);
     if (!checkInEl.value) {
-      checkInEl.value = toISODate(today);
+      setInputDate(checkInEl, today);
     }
     var cin = parseISODate(checkInEl.value) || today;
     var minOut = addDays(cin, 1);
-    checkOutEl.min = toISODate(minOut);
+    setInputMin(checkOutEl, minOut);
     var cout = parseISODate(checkOutEl.value);
     if (!cout || cout <= cin) {
       // Default to ~30 nights for serviced apartments / monthly stays
-      checkOutEl.value = toISODate(addDays(cin, 30));
+      setInputDate(checkOutEl, addDays(cin, 30));
     }
+  }
+
+  function attachFlatpickr(el, onChange) {
+    if (!el || !window.flatpickr) return null;
+    if (el._flatpickr) return el._flatpickr;
+    return flatpickr(el, {
+      dateFormat: "Y-m-d",
+      altInput: true,
+      altFormat: fpAltFormat(),
+      altInputClass: "flatpickr-alt",
+      locale: fpLocale(),
+      disableMobile: true,
+      allowInput: false,
+      monthSelectorType: "static",
+      animate: true,
+      onChange: function () {
+        if (typeof onChange === "function") onChange();
+      }
+    });
+  }
+
+  function refreshFlatpickrLocales() {
+    $all("input.js-date").forEach(function (el) {
+      var fp = el._flatpickr;
+      if (!fp) return;
+      fp.set("locale", fpLocale());
+      fp.set("altFormat", fpAltFormat());
+    });
   }
 
   /* ---------- SiteMinder deep link ----------
@@ -174,6 +236,8 @@
       var checkIn = form.querySelector('[name="checkIn"], [name="checkin"]');
       var checkOut = form.querySelector('[name="checkOut"], [name="checkout"]');
       if (!checkIn || !checkOut) return;
+      attachFlatpickr(checkIn, function () { setMinDates(checkIn, checkOut); });
+      attachFlatpickr(checkOut);
       setMinDates(checkIn, checkOut);
       checkIn.addEventListener("change", function () { setMinDates(checkIn, checkOut); });
 
@@ -250,7 +314,11 @@
 
     var checkIn = form.querySelector('[name="adate"]');
     var checkOut = form.querySelector('[name="ddate"]');
-    if (checkIn && checkOut) setMinDates(checkIn, checkOut);
+    if (checkIn && checkOut) {
+      attachFlatpickr(checkIn, function () { setMinDates(checkIn, checkOut); });
+      attachFlatpickr(checkOut);
+      setMinDates(checkIn, checkOut);
+    }
     if (checkIn) checkIn.addEventListener("change", function () { setMinDates(checkIn, checkOut); });
 
     form.addEventListener("submit", function (e) {
@@ -263,7 +331,7 @@
         var wrap = input && input.closest(".field");
         if (!input || !wrap) return "";
         var val = (input.value || "").trim();
-        if (!val || (input.type === "date" && !parseISODate(val))) {
+        if (!val || (input.classList.contains("js-date") && !parseISODate(val))) {
           setFieldError(wrap, langZh ? "請填寫" + label : label + " is required");
           ok = false;
           return "";

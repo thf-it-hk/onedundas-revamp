@@ -40,6 +40,7 @@ HEADER = '''<!DOCTYPE html>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400;1,9..40,500&family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.css">
   <link rel="icon" href="assets/images/logo-sm.png">
 {preload}
 </head>
@@ -120,6 +121,8 @@ FOOTER = '''
       <span>© 2026 One Dundas. All rights reserved.</span>
     </div>
   </footer>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/l10n/zh-tw.js" defer></script>
   <script src="assets/js/main.js" defer></script>
 </body>
 </html>
@@ -228,11 +231,11 @@ AVAIL = f'''
   <form data-avail-form action="{BOOK}" method="get" target="_blank">
     <div class="field">
       <label for="avail-checkin">{t("Check-in", "入住日期")}</label>
-      <input id="avail-checkin" type="date" name="checkIn" required>
+      <input id="avail-checkin" class="js-date" type="text" name="checkIn" required autocomplete="off" inputmode="none" placeholder="DD/MM/YYYY">
     </div>
     <div class="field">
       <label for="avail-checkout">{t("Check-out", "退房日期")}</label>
-      <input id="avail-checkout" type="date" name="checkOut" required>
+      <input id="avail-checkout" class="js-date" type="text" name="checkOut" required autocomplete="off" inputmode="none" placeholder="DD/MM/YYYY">
     </div>
     <div class="field">
       <label for="avail-adults">{t("Adults", "成人")}</label>
@@ -848,12 +851,12 @@ contact_body = f'''
           </div>
           <div class="field">
             <label for="adate">{t("Expected arrival *", "預計入住日期 *")}</label>
-            <input id="adate" name="adate" type="date" required>
+            <input id="adate" class="js-date" name="adate" type="text" required autocomplete="off" inputmode="none" placeholder="DD/MM/YYYY">
             <div class="field-error" aria-live="polite"></div>
           </div>
           <div class="field">
             <label for="ddate">{t("Expected departure *", "預計退房日期 *")}</label>
-            <input id="ddate" name="ddate" type="date" required>
+            <input id="ddate" class="js-date" name="ddate" type="text" required autocomplete="off" inputmode="none" placeholder="DD/MM/YYYY">
             <div class="field-error" aria-live="polite"></div>
           </div>
           <div class="field">
@@ -913,11 +916,11 @@ contact_body = f'''
         <form data-avail-form>
           <div class="field">
             <label for="c-checkin">{t("Check-in", "入住")}</label>
-            <input id="c-checkin" type="date" name="checkIn" required>
+            <input id="c-checkin" class="js-date" type="text" name="checkIn" required autocomplete="off" inputmode="none" placeholder="DD/MM/YYYY">
           </div>
           <div class="field">
             <label for="c-checkout">{t("Check-out", "退房")}</label>
-            <input id="c-checkout" type="date" name="checkOut" required>
+            <input id="c-checkout" class="js-date" type="text" name="checkOut" required autocomplete="off" inputmode="none" placeholder="DD/MM/YYYY">
           </div>
           <button class="btn btn--primary btn--block" type="submit">{t("Book now", "立即預訂")}</button>
         </form>

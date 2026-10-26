@@ -7,6 +7,7 @@ Modern bilingual (Traditional Chinese + English) static rebuild of [onedundashk.
 ## Stack
 
 - Plain HTML / CSS / JS (no build step required)
+- Date pickers: **Flatpickr** 4.6 (CDN) themed to purple `#6b2d7b` / orange `#fb8e03` / DM Sans; EN + 繁 (`zh_tw`) locales; values stay `YYYY-MM-DD` for SiteMinder
 - Shared design system: purple brand (`#87768b` / `#6b2d7b`), **DM Sans** (Latin/English) + **Noto Sans TC** (Traditional Chinese)
 - Header brand shows **logo image only** (transparent `assets/images/logo.png`); accessible name via `alt` + `.visually-hidden`
 - Top nav labels use CSS `text-transform: uppercase` (EN); Chinese unaffected

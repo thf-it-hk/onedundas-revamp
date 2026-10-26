@@ -254,6 +254,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400;1,9..40,500&family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.css">
   <link rel="icon" href="assets/images/logo-sm.png">
 
 </head>
@@ -359,12 +360,12 @@
           </div>
           <div class="field">
             <label for="adate"><span class="i18n-en" data-i18n-en>Expected arrival *</span><span class="i18n-zh" data-i18n-zh lang="zh-Hant">預計入住日期 *</span></label>
-            <input id="adate" name="adate" type="date" required>
+            <input id="adate" class="js-date" name="adate" type="text" required autocomplete="off" inputmode="none" placeholder="DD/MM/YYYY">
             <div class="field-error" aria-live="polite"></div>
           </div>
           <div class="field">
             <label for="ddate"><span class="i18n-en" data-i18n-en>Expected departure *</span><span class="i18n-zh" data-i18n-zh lang="zh-Hant">預計退房日期 *</span></label>
-            <input id="ddate" name="ddate" type="date" required>
+            <input id="ddate" class="js-date" name="ddate" type="text" required autocomplete="off" inputmode="none" placeholder="DD/MM/YYYY">
             <div class="field-error" aria-live="polite"></div>
           </div>
           <div class="field">
@@ -424,11 +425,11 @@
         <form data-avail-form>
           <div class="field">
             <label for="c-checkin"><span class="i18n-en" data-i18n-en>Check-in</span><span class="i18n-zh" data-i18n-zh lang="zh-Hant">入住</span></label>
-            <input id="c-checkin" type="date" name="checkIn" required>
+            <input id="c-checkin" class="js-date" type="text" name="checkIn" required autocomplete="off" inputmode="none" placeholder="DD/MM/YYYY">
           </div>
           <div class="field">
             <label for="c-checkout"><span class="i18n-en" data-i18n-en>Check-out</span><span class="i18n-zh" data-i18n-zh lang="zh-Hant">退房</span></label>
-            <input id="c-checkout" type="date" name="checkOut" required>
+            <input id="c-checkout" class="js-date" type="text" name="checkOut" required autocomplete="off" inputmode="none" placeholder="DD/MM/YYYY">
           </div>
           <button class="btn btn--primary btn--block" type="submit"><span class="i18n-en" data-i18n-en>Book now</span><span class="i18n-zh" data-i18n-zh lang="zh-Hant">立即預訂</span></button>
         </form>
@@ -493,6 +494,8 @@
       <span>© 2026 One Dundas. All rights reserved.</span>
     </div>
   </footer>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/l10n/zh-tw.js" defer></script>
   <script src="assets/js/main.js" defer></script>
 </body>
 </html>

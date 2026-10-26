@@ -186,6 +186,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400;1,9..40,500&family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.css">
   <link rel="icon" href="assets/images/logo-sm.png">
   <link rel="preload" as="image" href="assets/images/hero-lobby.jpg" fetchpriority="high">
 </head>
@@ -236,11 +237,11 @@
   <form data-avail-form action="https://book-directonline.com/properties/OneDundasDirect/" method="get" target="_blank">
     <div class="field">
       <label for="avail-checkin"><span class="i18n-en" data-i18n-en>Check-in</span><span class="i18n-zh" data-i18n-zh lang="zh-Hant">入住日期</span></label>
-      <input id="avail-checkin" type="date" name="checkIn" required>
+      <input id="avail-checkin" class="js-date" type="text" name="checkIn" required autocomplete="off" inputmode="none" placeholder="DD/MM/YYYY">
     </div>
     <div class="field">
       <label for="avail-checkout"><span class="i18n-en" data-i18n-en>Check-out</span><span class="i18n-zh" data-i18n-zh lang="zh-Hant">退房日期</span></label>
-      <input id="avail-checkout" type="date" name="checkOut" required>
+      <input id="avail-checkout" class="js-date" type="text" name="checkOut" required autocomplete="off" inputmode="none" placeholder="DD/MM/YYYY">
     </div>
     <div class="field">
       <label for="avail-adults"><span class="i18n-en" data-i18n-en>Adults</span><span class="i18n-zh" data-i18n-zh lang="zh-Hant">成人</span></label>
@@ -402,6 +403,8 @@
       <span>© 2026 One Dundas. All rights reserved.</span>
     </div>
   </footer>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/l10n/zh-tw.js" defer></script>
   <script src="assets/js/main.js" defer></script>
 </body>
 </html>
