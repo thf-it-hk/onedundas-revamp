@@ -116,7 +116,6 @@ FOOTER = '''
     </div>
     <div class="container footer-bottom">
       <span>© 2026 One Dundas. All rights reserved.</span>
-      <span>{footer_note}</span>
     </div>
   </footer>
   <script src="assets/js/main.js" defer></script>
@@ -139,7 +138,6 @@ NAV = {
     "legal": t("Legal", "法律資訊"),
     "privacy": t("Privacy", "私隱政策"),
     "disclaimer": t("Disclaimer", "免責聲明"),
-    "footer_note": t("Serviced apartments in Mongkok", "旺角服務式公寓"),
     "book": BOOK,
 }
 
