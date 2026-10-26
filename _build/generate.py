@@ -356,8 +356,7 @@ else:
 PROMO_PAGE = f"""
 <section class="page-hero">
   <div class="container">
-    <p class="eyebrow">{t("Promotion", "推廣活動")}</p>
-    <h1>{t("Current offers", "最新優惠")}</h1>
+    <h1 class="eyebrow">{t("Promotion", "推廣活動")}</h1>
   </div>
 </section>
 <section class="section">
@@ -507,8 +506,7 @@ index_body = f'''
 about_body = f'''
 <section class="page-hero">
   <div class="container">
-    <p class="eyebrow">{t("About", "關於")}</p>
-    <h1>{t("About One Dundas", "關於壹登")}</h1>
+    <h1 class="eyebrow">{t("About", "關於")}</h1>
     <p class="lead">{t("Serviced apartments in the heart of Kowloon.", "座落九龍核心的服務式公寓。")}</p>
   </div>
 </section>
@@ -599,8 +597,7 @@ def room_block(anchor, title_en, title_zh, img, size, bed, occ, storey, desc_en,
 accom_body = f'''
 <section class="page-hero">
   <div class="container">
-    <p class="eyebrow">{t("Accommodation", "住宿")}</p>
-    <h1>{t("Apartments", "房間")}</h1>
+    <h1 class="eyebrow">{t("Accommodation", "住宿")}</h1>
     <p class="lead">{t("One Dundas consists of 109 well-appointed Studio, One-Bedroom and Two-Bedroom apartments.", "壹登精心打造了109間設施齊全的開放式、單卧室及雙卧室公寓。")}</p>
     <ul class="pill-list">
       <li><a href="#studio" style="text-decoration:none;color:inherit">{t("Studio", "開放式")}</a></li>
@@ -641,8 +638,7 @@ accom_body = f'''
 location_body = f'''
 <section class="page-hero">
   <div class="container">
-    <p class="eyebrow">{t("Location", "位置")}</p>
-    <h1>{t("Map & neighbourhood", "地圖與周邊")}</h1>
+    <h1 class="eyebrow">{t("Location", "位置")}</h1>
     <p class="lead">{t("1 Dundas Street, Mongkok, Kowloon, Hong Kong", "香港九龍旺角登打士街1號")}</p>
   </div>
 </section>
@@ -731,8 +727,7 @@ gallery_items = "\n".join(
 gallery_body = f'''
 <section class="page-hero">
   <div class="container">
-    <p class="eyebrow">{t("Media", "媒體")}</p>
-    <h1>{t("Gallery", "相片集")}</h1>
+    <h1 class="eyebrow">{t("Media", "媒體")}</h1>
     <p class="lead">{t("A selection of interiors, facilities and exteriors. Click any image to open full size.", "精選室內、設施與外觀相片。點擊可開啟原圖。")}</p>
   </div>
 </section>
@@ -756,8 +751,7 @@ vtour_body = f'''
 <link rel="stylesheet" href="assets/vt/pannellum/pannellum.css">
 <section class="page-hero">
   <div class="container">
-    <p class="eyebrow">{t("Virtual Tour", "虛擬導覽")}</p>
-    <h1>{t("Explore our apartments", "探索公寓")}</h1>
+    <h1 class="eyebrow">{t("Virtual Tour", "虛擬導覽")}</h1>
     <p class="lead">{t("Choose an apartment type, then drag to look around 360°. Click the arrows to move between rooms.", "選擇房型，拖曳畫面即可 360° 環視；點擊箭咀可前往其他房間。")}</p>
   </div>
 </section>
@@ -786,8 +780,7 @@ vtour_body = f'''
 contact_body = f'''
 <section class="page-hero">
   <div class="container">
-    <p class="eyebrow">{t("Contact", "聯絡")}</p>
-    <h1>{t("Enquiry", "查詢")}</h1>
+    <h1 class="eyebrow">{t("Contact", "聯絡")}</h1>
     <p class="lead">{t("Tell us about your stay. Our leasing team will follow up.", "告訴我們您的入住需要，租務團隊會與您跟進。")}</p>
   </div>
 </section>
@@ -985,7 +978,7 @@ HOTEL = {"@type": ["Hotel", "LodgingBusiness"], "@id": SITE_URL + "#hotel", "nam
 # ===================== PRIVACY =====================
 privacy_body = f'''
 <section class="page-hero"><div class="container">
-  <h1>{t("Privacy Statement", "私隱政策")}</h1>
+  <h1 class="eyebrow">{t("Privacy", "私隱政策")}</h1>
 </div></section>
 <section class="section"><div class="container legal">
   <p>{t("We, One Dundas, respect your privacy and have formulated this statement outlining practices in relation to collection, use, retention, disclosure, transfer, security and accessibility of your personal information.", "壹登尊重您的私隱，並制訂本聲明說明有關收集、使用、保留、披露、轉移、保安及查閱個人資料的做法。")}</p>
@@ -1000,7 +993,7 @@ privacy_body = f'''
 # ===================== DISCLAIMER =====================
 disclaimer_body = f'''
 <section class="page-hero"><div class="container">
-  <h1>{t("Disclaimer", "免責聲明")}</h1>
+  <h1 class="eyebrow">{t("Disclaimer", "免責聲明")}</h1>
 </div></section>
 <section class="section"><div class="container legal">
   <p>{t("Before using this website, please read these terms carefully. By using this website you signify that you have read and accept the terms below.", "使用本網站前請細閱下列條款。使用本網站即表示您已閱讀並接受以下條款。")}</p>
