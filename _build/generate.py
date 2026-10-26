@@ -81,7 +81,9 @@ FOOTER = '''
   <footer class="site-footer">
     <div class="container footer-grid">
       <div class="footer-brand">
+        <img class="footer-logo" src="assets/images/logo-sm.png" width="56" height="56" alt="One Dundas logo">
         <strong>One Dundas 壹登</strong>
+        <p class="footer-meta">{footer_meta}</p>
         <p>1 Dundas Street, Mongkok, Kowloon, Hong Kong<br>九龍旺角登打士街1號</p>
         <p>
           <a href="tel:+85227001122">+852 2700 1122</a><br>
@@ -140,6 +142,8 @@ NAV = {
     "legal": t("LEGAL", "法律資訊"),
     "privacy": t("PRIVACY", "私隱政策"),
     "disclaimer": t("DISCLAIMER", "免責聲明"),
+    # Short location meta only — do NOT restore removed「旺角服務式公寓」/「Serviced apartments in Mongkok」tagline
+    "footer_meta": t("Mongkok · Dundas Street", "旺角 · 登打士街"),
     "book": BOOK,
 }
 
@@ -305,7 +309,7 @@ def _home_promo():
         <p>{summ}</p>
         {_code(p)}
         <div class="btn-row">
-          <a class="btn btn--light" href="promotion.html">{t("View promotion", "查看推廣")}</a>
+          <a class="btn btn--accent" href="promotion.html">{t("View promotion", "查看推廣")}</a>
           <a class="btn btn--ghost" style="border-color:#fff;color:#fff" href="tel:+85227001122">+852 2700 1122</a>
         </div>
       </div>
@@ -332,7 +336,7 @@ def _promo_card(p):
         {_code(p)}
         {_date_line(p)}
         <div class="btn-row">
-          <a class="btn btn--light" href="{link}" data-book-now target="_blank" rel="noopener noreferrer">{t("Book Now", "立即預訂")}</a>
+          <a class="btn btn--accent" href="{link}" data-book-now target="_blank" rel="noopener noreferrer">{t("Book Now", "立即預訂")}</a>
           <a class="btn btn--ghost" style="border-color:#fff;color:#fff" href="tel:+85227001122">{t("Call leasing", "致電租務部")}</a>
         </div>
       </div>
@@ -475,7 +479,7 @@ index_body = f'''
   </div>
 </section>
 
-<section class="section section--tint">
+<section class="section section--charcoal">
   <div class="container">
     <div class="stat-row">
       <div class="stat"><strong>109</strong><span>{t("Apartments", "公寓單位")}</span></div>
