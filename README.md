@@ -7,7 +7,7 @@ Modern bilingual (Traditional Chinese + English) static rebuild of [onedundashk.
 ## Stack
 
 - Plain HTML / CSS / JS (no build step required)
-- Shared design system: purple brand (`#87768b` / `#6b2d7b`), **Open Sans** + **Source Sans Pro** (matching original site) + Noto Sans TC for 繁
+- Shared design system: purple brand (`#87768b` / `#6b2d7b`), **DM Sans** (Latin/English) + **Noto Sans TC** (Traditional Chinese)
 - Header brand shows **logo image only** (transparent `assets/images/logo.png`); accessible name via `alt` + `.visually-hidden`
 - Top nav labels use CSS `text-transform: uppercase` (EN); Chinese unaffected
 - Language switch via `localStorage` + `html[lang]` (EN / 繁) — separate strings, not mid-sentence WPML stacking
@@ -133,6 +133,6 @@ python3 _build/generate.py
 ## Brand notes
 
 - Purple primary from legacy theme: `#87768b`, deep CTA `#6b2d7b`, accent orange `#fb8e03`
-- Fonts: Open Sans + Source Sans Pro (Google Fonts HTTPS), Noto Sans TC for CJK; button text uses dark on light/orange/white and light only on deep purple
+- Fonts: DM Sans + Noto Sans TC (Google Fonts HTTPS, weights 400/500/600/700); button text uses dark on light/orange/white and light only on deep purple
 - Address: 1 Dundas Street, Mongkok, Kowloon, Hong Kong
 - ~109 units: Studio / 1BR / 2BR

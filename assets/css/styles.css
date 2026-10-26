@@ -19,8 +19,8 @@
   --shadow: 0 10px 30px rgba(90, 36, 104, 0.08);
   --shadow-lg: 0 20px 50px rgba(90, 36, 104, 0.14);
   --shadow-hover: 0 14px 36px rgba(107, 45, 123, 0.18);
-  --font: "Open Sans", "Source Sans Pro", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif;
-  --display: "Source Sans Pro", "Open Sans", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif;
+  --font: "DM Sans", "Noto Sans TC", system-ui, sans-serif;
+  --display: "DM Sans", "Noto Sans TC", system-ui, sans-serif;
   --max: 1120px;
   --header-h: 104px;
 }
