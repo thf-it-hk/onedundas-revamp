@@ -215,7 +215,26 @@ h3 { font-size: 1.45rem; }
 }
 .hero__content { position: relative; z-index: 1; padding: 5rem 0 3rem; }
 .hero h1 { color: #fff; max-width: 16ch; }
+/* 16ch ≈ ~8 CJK glyphs and orphans the last char of short ZH titles.
+   Widen for zh-Hant; keep-all + strict line-break avoid mid-phrase splits. */
+html[lang="zh-Hant"] .hero h1 {
+  max-width: min(100%, 12em);
+  word-break: keep-all;
+  line-break: strict;
+  overflow-wrap: normal;
+}
 .hero .lead { color: rgba(255,255,255,.9); }
+
+/* Chinese heading wrap: prefer phrase-level breaks, not English mid-word style */
+html[lang="zh-Hant"] h1,
+html[lang="zh-Hant"] h2,
+html[lang="zh-Hant"] h3,
+html[lang="zh-Hant"] .display {
+  word-break: keep-all;
+  line-break: strict;
+  overflow-wrap: anywhere;
+}
+.nowrap { white-space: nowrap; }
 
 /* Availability bar */
 .avail-bar {

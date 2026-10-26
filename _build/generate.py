@@ -402,7 +402,7 @@ index_body = f'''
   <div class="hero__media" style="background-image:url('assets/images/hero-lobby.jpg')" role="img" aria-label="One Dundas lobby"></div>
   <div class="container hero__content">
     <p class="eyebrow">{t("Serviced Apartments · Mongkok", "服務式公寓 · 旺角")}</p>
-    <h1>{t("Your home in the heart of Kowloon", "九龍核心的都市居所")}</h1>
+    <h1>{t("Your home in the heart of Kowloon", "九龍核心的​都市居所")}</h1>
     <p class="lead">{t("109 stylish Studio, One-Bedroom and Two-Bedroom apartments at 1 Dundas Street — steps from Mongkok’s markets, MTR and city life.", "壹登提供109間時尚開放式、單卧室及雙卧室公寓，位於登打士街1號，步行即達旺角市集、港鐵與繁華街景。")}</p>
     <div class="btn-row">
       <a class="btn btn--accent" href="{BOOK}" data-book-now target="_blank" rel="noopener noreferrer">{t("Book Now", "立即預訂")}</a>
@@ -455,7 +455,7 @@ index_body = f'''
   <div class="container grid-2">
     <div>
       <p class="eyebrow">{t("Why One Dundas", "為何選擇壹登")}</p>
-      <h2>{t("Urban calm, steps from Mongkok energy", "繁華旺角旁的寧靜居所")}</h2>
+      <h2>{t("Urban calm, steps from Mongkok energy", "繁華旺角旁的​寧靜居所")}</h2>
       <p class="lead">{t("Set on the residential side of Mongkok yet moments from Langham Place, Ladies’ Market and Mongkok MTR.", "座落旺角住宅區一側，步行即達朗豪坊、女人街與旺角港鐵站。")}</p>
       <ul class="feature-list">
         <li>{t("109 apartments across Studio / 1BR / 2BR", "109間開放式／單卧／雙卧公寓")}</li>
