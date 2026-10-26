@@ -124,20 +124,22 @@ FOOTER = '''
 '''
 
 NAV = {
-    "home": t("Home", "首頁"),
-    "about": t("About", "關於我們"),
-    "accom": t("Accommodation", "住宿"),
-    "location": t("Location", "位置"),
-    "promo": t("Promotion", "推廣"),
-    "gallery": t("Gallery", "相片集"),
-    "vtour": t("Virtual Tour", "虛擬導覽"),
-    "contact": t("Enquiry", "查詢"),
-    "book_label": t("Book Now", "立即預訂"),
-    "explore": t("Explore", "探索"),
-    "stay": t("Stay", "住宿相關"),
-    "legal": t("Legal", "法律資訊"),
-    "privacy": t("Privacy", "私隱政策"),
-    "disclaimer": t("Disclaimer", "免責聲明"),
+    # EN main-nav labels stored uppercase (stylish hotel nav); CSS also applies text-transform.
+    # Footer reuses these keys — uppercase EN is fine for footer links too.
+    "home": t("HOME", "首頁"),
+    "about": t("ABOUT", "關於我們"),
+    "accom": t("ACCOMMODATION", "住宿"),
+    "location": t("LOCATION", "位置"),
+    "promo": t("PROMOTION", "推廣"),
+    "gallery": t("GALLERY", "相片集"),
+    "vtour": t("VIRTUAL TOUR", "虛擬導覽"),
+    "contact": t("ENQUIRY", "查詢"),
+    "book_label": t("Book Now", "立即預訂"),  # CTA stays title case
+    "explore": t("EXPLORE", "探索"),
+    "stay": t("STAY", "住宿相關"),
+    "legal": t("LEGAL", "法律資訊"),
+    "privacy": t("PRIVACY", "私隱政策"),
+    "disclaimer": t("DISCLAIMER", "免責聲明"),
     "book": BOOK,
 }
 
