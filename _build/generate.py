@@ -280,6 +280,29 @@ def _load_promos():
 PROMOS = _load_promos()
 E = lambda v: _html.escape(str(v or ""))
 
+def _format_terms(raw):
+    """CMS terms → HTML. Unwrap markdown/bracketed emails; paragraphs → list."""
+    s = (raw or "").strip()
+    if not s:
+        return ""
+    # [label](url) → label (mailto kept as plain email text; we linkify below)
+    s = re.sub(r"\[([^\]]+)\]\(([^)]+)\)", r"\1", s)
+    # leftover [email@…] brackets
+    s = re.sub(r"\[([^\]]*@[^\]]+)\]", r"\1", s)
+    if re.search(r"<(ul|ol|p|li|br|a)\b", s, re.I):
+        # rich-text HTML from CMS — still linkify bare email if unlinked
+        if "mailto:" not in s:
+            s = re.sub(r"(?<![\w.>])(leasing@onedundashk\.com)", r'<a href="mailto:\1">\1</a>', s)
+        return s
+    parts = [p.strip() for p in re.split(r"\n\s*\n", s) if p.strip()]
+    def linkify(chunk):
+        chunk = E(chunk).replace("\n", "<br>")
+        return re.sub(r"(?<![\w.>])(leasing@onedundashk\.com)", r'<a href="mailto:\1">\1</a>', chunk)
+    if len(parts) >= 2:
+        return "<ul>" + "".join(f"<li>{linkify(p)}</li>" for p in parts) + "</ul>"
+    return f"<p>{linkify(s)}</p>"
+
+
 def _img(p):
     im = (p.get("image") or "").lstrip("/")
     return im
@@ -302,7 +325,7 @@ def _home_promo():
     im = _img(p)
     img = f'<div><img src="{E(im)}" alt="{E(p.get("image_alt") or p.get("title_en"))}" style="border-radius:12px;width:100%;object-fit:cover;max-height:220px"></div>' if im else ""
     summ = _tx(p, "summary") if p.get("summary_en") else _tx(p, "description")
-    return f"""<section class="section">
+    return f"""<section class="section section--after-hero">
   <div class="container">
     <div class="promo-banner">
       <div>
@@ -328,7 +351,7 @@ def _promo_card(p):
     if p.get("terms_en") or p.get("terms_zh"):
         terms = f"""<div style="margin-top:2.5rem;max-width:48rem" class="feature-list">
       <h2>{t("Terms & conditions", "條款與細則")}</h2>
-      {t(p.get("terms_en") or "", p.get("terms_zh") or p.get("terms_en") or "")}
+      {t(_format_terms(p.get("terms_en") or ""), _format_terms(p.get("terms_zh") or p.get("terms_en") or ""))}
     </div>"""
     return f"""<div class="promo-banner" style="margin-bottom:2rem">
       <div>
@@ -356,7 +379,7 @@ else:
     </div>"""
 
 PROMO_PAGE = f"""
-<section class="page-hero">
+<section class="page-hero page-hero--compact page-hero--asymmetric">
   <div class="container">
     <h1 class="eyebrow">{t("Promotion", "推廣活動")}</h1>
   </div>
@@ -424,8 +447,8 @@ index_body = f'''
     <p class="eyebrow">{t("Apartments", "公寓")}</p>
     <h2>{t("Find your space", "選擇合適房型")}</h2>
     <p class="lead">{t("Floor-to-ceiling windows, kitchenettes and thoughtful amenities — designed for singles, students and small families.", "大片落地玻璃窗、設備齊全的廚房與貼心設施，適合單身、海外學生與小家庭。")}</p>
-    <div class="grid-3" style="margin-top:2rem">
-      <article class="card">
+    <div class="rooms-grid">
+      <article class="card card--room card--room-a">
         <img src="assets/images/studio-a.jpg" alt="Studio apartment at One Dundas with queen bed and city view">
         <div class="card__body">
           <h3>{t("Studio", "開放式公寓")}</h3>
@@ -434,7 +457,7 @@ index_body = f'''
           <a class="btn btn--ghost" href="accommodation.html#studio">{t("Studio details", "開放式詳情")}</a>
         </div>
       </article>
-      <article class="card">
+      <article class="card card--room card--room-b">
         <img src="assets/images/1br-living.jpg" alt="One-bedroom apartment living area at One Dundas">
         <div class="card__body">
           <h3>{t("One-Bedroom", "單卧室公寓")}</h3>
@@ -443,7 +466,7 @@ index_body = f'''
           <a class="btn btn--ghost" href="accommodation.html#one-bedroom">{t("One-Bedroom details", "單卧室詳情")}</a>
         </div>
       </article>
-      <article class="card">
+      <article class="card card--room card--room-c">
         <img src="assets/images/twobed-living.jpg" alt="Two-bedroom apartment living room at One Dundas">
         <div class="card__body">
           <h3>{t("Two-Bedroom", "雙卧室公寓")}</h3>
@@ -457,12 +480,12 @@ index_body = f'''
 </section>
 
 <section class="section">
-  <div class="container grid-2">
-    <div>
+  <div class="container grid-2 why-grid">
+    <div class="why-copy">
       <p class="eyebrow">{t("Why One Dundas", "為何選擇壹登")}</p>
       <h2>{t("Urban calm, steps from Mongkok energy", "繁華旺角旁的​寧靜居所")}</h2>
       <p class="lead">{t("Set on the residential side of Mongkok yet moments from Langham Place, Ladies’ Market and Mongkok MTR.", "座落旺角住宅區一側，步行即達朗豪坊、女人街與旺角港鐵站。")}</p>
-      <ul class="feature-list">
+      <ul class="feature-list feature-list--ranked">
         <li>{t("109 apartments across Studio / 1BR / 2BR", "109間開放式／單卧／雙卧公寓")}</li>
         <li>{t("Housekeeping twice weekly · linen weekly", "每週兩次清潔 · 每週更換床單")}</li>
         <li>{t("Outdoor leisure area & gym · BBQ rental", "戶外休憩與健身設施 · 燒烤爐租用")}</li>
@@ -474,8 +497,8 @@ index_body = f'''
         <a class="btn btn--ghost" href="location.html">{t("Location", "位置交通")}</a>
       </div>
     </div>
-    <div>
-      <img src="assets/images/hero-eco.jpg" alt="Eco-friendly apartment interior at One Dundas, Mongkok" style="border-radius:16px;box-shadow:var(--shadow-lg)">
+    <div class="why-media">
+      <img class="why-media__img" src="assets/images/hero-eco.jpg" alt="Eco-friendly apartment interior at One Dundas, Mongkok">
     </div>
   </div>
 </section>
@@ -506,7 +529,7 @@ index_body = f'''
 
 # ===================== ABOUT =====================
 about_body = f'''
-<section class="page-hero">
+<section class="page-hero page-hero--left page-hero--asymmetric">
   <div class="container">
     <h1 class="eyebrow">{t("About", "關於")}</h1>
     <p class="lead">{t("Serviced apartments in the heart of Kowloon.", "座落九龍核心的服務式公寓。")}</p>
@@ -567,7 +590,7 @@ def room_block(anchor, title_en, title_zh, img, size, bed, occ, storey, desc_en,
       <h2>{t(title_en, title_zh)}</h2>
       <p>{t(desc_en, desc_zh)}</p>
       <div class="table-wrap" style="margin:1.25rem 0">
-        <table class="spec">
+        <table class="spec spec--room">
           <thead><tr>
             <th>{t("Size", "面積")}</th>
             <th>{t("Bedding", "床具")}</th>
@@ -597,7 +620,7 @@ def room_block(anchor, title_en, title_zh, img, size, bed, occ, storey, desc_en,
 '''
 
 accom_body = f'''
-<section class="page-hero">
+<section class="page-hero page-hero--left">
   <div class="container">
     <h1 class="eyebrow">{t("Accommodation", "住宿")}</h1>
     <p class="lead">{t("One Dundas consists of 109 well-appointed Studio, One-Bedroom and Two-Bedroom apartments.", "壹登精心打造了109間設施齊全的開放式、單卧室及雙卧室公寓。")}</p>
@@ -638,7 +661,7 @@ accom_body = f'''
 
 # ===================== LOCATION =====================
 location_body = f'''
-<section class="page-hero">
+<section class="page-hero page-hero--compact page-hero--left">
   <div class="container">
     <h1 class="eyebrow">{t("Location", "位置")}</h1>
     <p class="lead">{t("1 Dundas Street, Mongkok, Kowloon, Hong Kong", "香港九龍旺角登打士街1號")}</p>
@@ -727,9 +750,9 @@ gallery_items = "\n".join(
     for fn, alt in GALLERY_IMGS
 )
 gallery_body = f'''
-<section class="page-hero">
+<section class="page-hero page-hero--asymmetric page-hero--meta">
   <div class="container">
-    <h1 class="eyebrow">{t("Media", "媒體")}</h1>
+    <h1 class="eyebrow">{t("GALLERY", "相片集")}</h1>
     <p class="lead">{t("A selection of interiors, facilities and exteriors. Click any image to open full size.", "精選室內、設施與外觀相片。點擊可開啟原圖。")}</p>
   </div>
 </section>
@@ -751,7 +774,7 @@ tour_tabs = "\n".join(
 tour_json = json.dumps(TOURS, ensure_ascii=False).replace("</", "<\\/")
 vtour_body = f'''
 <link rel="stylesheet" href="assets/vt/pannellum/pannellum.css">
-<section class="page-hero">
+<section class="page-hero page-hero--left page-hero--meta">
   <div class="container">
     <h1 class="eyebrow">{t("Virtual Tour", "虛擬導覽")}</h1>
     <p class="lead">{t("Choose an apartment type, then drag to look around 360°. Click the arrows to move between rooms.", "選擇房型，拖曳畫面即可 360° 環視；點擊箭咀可前往其他房間。")}</p>
@@ -780,9 +803,9 @@ vtour_body = f'''
 
 # ===================== CONTACT / ENQUIRY =====================
 contact_body = f'''
-<section class="page-hero">
+<section class="page-hero page-hero--left page-hero--asymmetric page-hero--meta">
   <div class="container">
-    <h1 class="eyebrow">{t("Contact", "聯絡")}</h1>
+    <h1 class="eyebrow">{t("ENQUIRY", "查詢")}</h1>
     <p class="lead">{t("Tell us about your stay. Our leasing team will follow up.", "告訴我們您的入住需要，租務團隊會與您跟進。")}</p>
   </div>
 </section>
@@ -979,7 +1002,7 @@ HOTEL = {"@type": ["Hotel", "LodgingBusiness"], "@id": SITE_URL + "#hotel", "nam
 
 # ===================== PRIVACY =====================
 privacy_body = f'''
-<section class="page-hero"><div class="container">
+<section class="page-hero page-hero--compact page-hero--left"><div class="container">
   <h1 class="eyebrow">{t("Privacy", "私隱政策")}</h1>
 </div></section>
 <section class="section"><div class="container legal">
@@ -994,7 +1017,7 @@ privacy_body = f'''
 
 # ===================== DISCLAIMER =====================
 disclaimer_body = f'''
-<section class="page-hero"><div class="container">
+<section class="page-hero page-hero--compact page-hero--left"><div class="container">
   <h1 class="eyebrow">{t("Disclaimer", "免責聲明")}</h1>
 </div></section>
 <section class="section"><div class="container legal">

@@ -153,10 +153,14 @@ h3 { font-size: 1.45rem; }
   overflow: hidden; clip: rect(0, 0, 0, 0);
   white-space: nowrap; border: 0;
 }
+/* Logo strategy: keep wordmark (logo-sm.png). logo-icon.png is a tiny
+   wordmark too — no true icon-only asset exists, so do not invent one. */
 .brand {
-  display: flex; align-items: center; gap: .5rem;
+  display: flex; align-items: center; gap: .65rem;
   text-decoration: none; color: inherit;
   flex-shrink: 0;
+  padding: .35rem 0;
+  margin-right: .35rem;
 }
 .brand img {
   width: 78px; height: 78px;
@@ -371,6 +375,33 @@ html[lang="zh-Hant"] .display {
 .card__meta { font-size: .9rem; color: var(--ink-muted); }
 .card .btn { margin-top: auto; align-self: flex-start; }
 
+/* Homepage "Find your space" — break equal-card template */
+.rooms-grid {
+  display: grid;
+  gap: 1.5rem;
+  margin-top: 2rem;
+  align-items: stretch;
+}
+@media (min-width: 768px) {
+  .rooms-grid {
+    grid-template-columns: 0.92fr 1.2fr 0.96fr;
+    align-items: end;
+    gap: 1.35rem;
+  }
+  .card--room-b {
+    margin-bottom: 1.15rem;
+    box-shadow: var(--shadow-lg);
+    border-color: rgba(107, 45, 123, .18);
+  }
+  .card--room-b:hover { box-shadow: var(--shadow-hover); }
+  .card--room-a .card__body { padding-bottom: 1.15rem; }
+  .card--room-b .card__body { padding-bottom: 2.15rem; padding-top: 1.45rem; }
+  .card--room-c .card__body { padding-bottom: 1.65rem; }
+  .card--room-a .btn { margin-top: 1.1rem; }
+  .card--room-b .btn { margin-top: 1.85rem; }
+  .card--room-c .btn { margin-top: .65rem; }
+}
+
 .feature-list { list-style: none; padding: 0; margin: 1rem 0 0; display: grid; gap: .55rem; }
 .feature-list li {
   padding-left: 1.5rem; position: relative;
@@ -379,6 +410,47 @@ html[lang="zh-Hant"] .display {
   content: ""; position: absolute; left: 0; top: .45rem;
   width: .65rem; height: .65rem; border-radius: 50%;
   background: var(--accent);
+}
+.feature-list--ranked li:nth-child(1)::before {
+  background: var(--purple-deep);
+  width: .78rem; height: .78rem; top: .38rem;
+}
+.feature-list--ranked li:nth-child(2)::before {
+  background: var(--purple-mid);
+}
+.feature-list--ranked li:nth-child(n+4)::before {
+  background: var(--purple-soft);
+  width: .55rem; height: .55rem; top: .5rem;
+}
+.feature-list--ranked { gap: .7rem; }
+
+/* Why One Dundas — break 50/50 stock landing */
+@media (min-width: 768px) {
+  .why-grid {
+    grid-template-columns: 5fr 7fr;
+    gap: 2.75rem;
+    align-items: center;
+  }
+}
+.why-media {
+  position: relative;
+  isolation: isolate;
+}
+.why-media__img {
+  display: block;
+  width: 100%;
+  border-radius: 28px 10px 28px 10px;
+  box-shadow: var(--shadow-lg);
+  position: relative;
+  z-index: 1;
+}
+.why-media::before {
+  content: "";
+  position: absolute;
+  inset: 1.35rem -0.85rem -0.85rem 1.1rem;
+  background: linear-gradient(145deg, var(--purple-tint), rgba(135, 118, 139, .28));
+  border-radius: 28px 10px 28px 10px;
+  z-index: 0;
 }
 
 .stat-row { display: grid; gap: 1rem; grid-template-columns: repeat(2, 1fr); }
@@ -396,6 +468,20 @@ html[lang="zh-Hant"] .display {
 .section--charcoal .stat strong { color: #fff; }
 .section--charcoal .stat span { color: rgba(255,255,255,.65); }
 
+/* Breathing room between homepage hero and early-bird promo */
+.section--after-hero {
+  padding-top: 3.75rem;
+  padding-bottom: 3.75rem;
+  position: relative;
+}
+.section--after-hero::before {
+  content: "";
+  display: block;
+  width: min(100% - 2rem, var(--max));
+  height: 1px;
+  margin: 0 auto 2.25rem;
+  background: linear-gradient(90deg, transparent, var(--line) 18%, var(--purple-soft) 50%, var(--line) 82%, transparent);
+}
 .promo-banner {
   display: grid; gap: 1.5rem; align-items: center;
   background: linear-gradient(120deg, #5a2468, #87768b 55%, #a46bb8);
@@ -419,6 +505,21 @@ table.spec { width: 100%; border-collapse: collapse; background: #fff; }
 table.spec th, table.spec td { padding: .9rem 1rem; text-align: left; border-bottom: 1px solid var(--line); }
 table.spec th { background: var(--purple-tint); color: var(--purple-deep); font-size: .85rem; letter-spacing: .04em; text-transform: uppercase; }
 table.spec tr:last-child td { border-bottom: 0; }
+/* Accommodation SIZE / BEDDING / STOREY: keep values on one line (match Two-Bedroom) */
+table.spec--room th,
+table.spec--room td {
+  white-space: nowrap;
+  padding: .75rem .85rem;
+  font-size: .92rem;
+  vertical-align: middle;
+}
+table.spec--room th {
+  font-size: .78rem;
+  letter-spacing: .05em;
+}
+table.spec--room td:nth-child(1) { min-width: 11.5rem; }
+table.spec--room td:nth-child(2) { min-width: 8.5rem; }
+table.spec--room td:nth-child(4) { min-width: 5.5rem; }
 
 .gallery-grid {
   display: grid; gap: .75rem;
@@ -474,6 +575,7 @@ table.spec tr:last-child td { border-bottom: 0; }
   background: var(--purple-tint);
   border-bottom: 1px solid var(--line);
   padding: 3.5rem 0 2.5rem;
+  text-align: left;
 }
 /* Eyebrow is the sole page title on inner pages (a11y h1, visually uppercase) */
 .page-hero .eyebrow {
@@ -495,6 +597,44 @@ table.spec tr:last-child td { border-bottom: 0; }
 }
 /* Deep-purple underline option via modifier if needed */
 .page-hero--deep .eyebrow { border-bottom-color: var(--purple-deep); }
+
+/* Per-page hero rhythm (break identical lavender+centered-band template) */
+.page-hero--compact {
+  padding: 2rem 0 1.35rem;
+}
+.page-hero--compact .eyebrow {
+  font-size: clamp(1.35rem, 2.6vw, 1.85rem);
+  letter-spacing: .14em;
+  margin-bottom: .55rem;
+  padding-bottom: .4rem;
+}
+.page-hero--left .container { text-align: left; }
+.page-hero--asymmetric .eyebrow {
+  border-bottom: none;
+  background-image: linear-gradient(var(--accent), var(--accent));
+  background-repeat: no-repeat;
+  background-size: 2.75rem 3px;
+  background-position: left bottom;
+  padding-bottom: .7rem;
+  position: relative;
+}
+.page-hero--asymmetric .eyebrow::after {
+  content: "";
+  position: absolute;
+  left: 3.4rem;
+  bottom: 0;
+  width: 7.5rem;
+  height: 2px;
+  background: var(--purple-soft);
+  opacity: .55;
+}
+.page-hero--meta .lead {
+  margin-top: .15rem;
+  max-width: 36rem;
+  border-left: 3px solid var(--accent);
+  padding-left: 1rem;
+  color: var(--ink-muted);
+}
 
 .form-card {
   background: #fff; border: 1px solid var(--line); border-radius: var(--radius);
@@ -621,13 +761,48 @@ button[disabled][aria-busy="true"] { opacity: .7; cursor: wait; }
   padding: .6rem 1.1rem; border-radius: 999px; font-weight: 700; cursor: pointer; font: inherit; font-weight: 700;
 }
 .tour-tab[aria-selected="true"] { background: var(--purple-deep); color: #fff; border-color: var(--purple-deep); }
-.tour-viewer { width: 100%; height: min(70vh, 640px); min-height: 360px; border-radius: 14px; overflow: hidden; background: #222; }
+.tour-viewer {
+  width: 100%; height: min(70vh, 640px); min-height: 360px;
+  border-radius: 14px; overflow: hidden;
+  background: var(--purple-dark);
+  border: none;
+  box-shadow: var(--shadow);
+}
 .tour-rooms { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 1rem; }
 .tour-rooms button {
   border: 1px solid var(--line); background: var(--purple-tint); color: var(--purple-deep);
   padding: .45rem .9rem; border-radius: 8px; cursor: pointer; font: inherit; font-weight: 600;
 }
 .tour-rooms button[aria-current="true"] { background: var(--purple-deep); color: #fff; }
+/* Kill default pannellum grey hatch / harsh black chrome */
+.tour-viewer .pnlm-container {
+  background: var(--purple-dark) !important;
+  background-image: none !important;
+}
+.tour-viewer .pnlm-about-msg { display: none !important; }
+.tour-viewer .pnlm-controls {
+  border: 1px solid rgba(107, 45, 123, .28) !important;
+  border-radius: 8px !important;
+  overflow: hidden;
+  box-shadow: 0 4px 14px rgba(42, 34, 48, .18);
+}
+.tour-viewer .pnlm-zoom-out {
+  border-top-color: rgba(107, 45, 123, .15) !important;
+}
+.tour-viewer .pnlm-load-box,
+.tour-viewer .pnlm-load-button {
+  background: rgba(90, 36, 104, .92) !important;
+  border-radius: 12px !important;
+  border: 1px solid rgba(251, 142, 3, .35);
+  box-shadow: 0 10px 28px rgba(42, 34, 48, .35);
+}
+.tour-viewer .pnlm-lbar {
+  border-color: rgba(255, 255, 255, .35) !important;
+  border-radius: 999px;
+  overflow: hidden;
+}
+.tour-viewer .pnlm-lbar-fill { background: var(--accent) !important; }
+.tour-viewer .pnlm-loading { background-color: var(--accent) !important; }
 .pnlm-hotspot-base.tour-hs {
   width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,.9);
   border: 3px solid var(--purple-deep); cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,.35);
