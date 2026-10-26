@@ -82,7 +82,6 @@ FOOTER = '''
   <footer class="site-footer">
     <div class="container footer-grid">
       <div class="footer-brand">
-        <img class="footer-logo" src="assets/images/logo-sm.png" width="40" height="40" alt="One Dundas logo">
         <strong>One Dundas 壹登</strong>
         <p class="footer-meta">{footer_meta}</p>
         <p>1 Dundas Street, Mongkok, Kowloon, Hong Kong<br>九龍旺角登打士街1號</p>
