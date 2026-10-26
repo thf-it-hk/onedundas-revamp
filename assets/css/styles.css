@@ -732,6 +732,7 @@ input.js-date.flatpickr-input:not(.flatpickr-alt) {
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: .35rem;
   color: #fff;
   position: absolute;
   left: 12.5%;
@@ -747,29 +748,120 @@ input.js-date.flatpickr-input:not(.flatpickr-alt) {
   background: transparent;
   border: none;
   font-family: var(--font);
-  line-height: 1;
-  height: auto;
-  padding: 0;
+  line-height: 32px;
+  height: 32px;
+  padding: 0 .35rem;
   margin: 0;
   vertical-align: middle;
+  display: inline-flex;
+  align-items: center;
+  box-sizing: border-box;
 }
 .flatpickr-current-month span.cur-month:hover,
-.flatpickr-current-month .flatpickr-monthDropdown-months:hover,
-.flatpickr-current-month input.cur-year:hover {
+.flatpickr-current-month .flatpickr-monthDropdown-months:hover {
   background: rgba(255, 255, 255, .12);
   border-radius: 8px;
+}
+/* Month <select> (if dropdown mode): white text + custom chevron */
+.flatpickr-current-month .flatpickr-monthDropdown-months {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  padding-right: 1.35rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23ffffff' d='M1.2 1.2L6 6l4.8-4.8 1.2 1.2L6 8.4 0 2.4z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right .2rem center;
+  background-size: 12px 8px;
+  cursor: pointer;
+}
+.flatpickr-current-month .flatpickr-monthDropdown-months option {
+  color: var(--ink);
+  background: #fff;
+}
+/* Year spinner: Flatpickr defaults are dark + tiny + opacity:0 — unusable on purple */
+.flatpickr-current-month .numInputWrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  width: 5.75rem;
+  height: 32px;
+  vertical-align: middle;
+  border-radius: 8px;
+}
+.flatpickr-current-month .numInputWrapper:hover {
+  background: rgba(255, 255, 255, .12);
+}
+.flatpickr-current-month .numInputWrapper input.cur-year {
+  width: 100%;
+  height: 32px;
+  line-height: 32px;
+  padding: 0 1.6rem 0 .4rem;
+  margin: 0;
+  color: #fff !important;
+  font-weight: 700;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+.flatpickr-current-month .numInputWrapper input.cur-year:hover {
+  background: transparent;
 }
 .flatpickr-current-month input.cur-year[disabled],
 .flatpickr-current-month input.cur-year[disabled]:hover {
   color: rgba(255, 255, 255, .85) !important;
+}
+.flatpickr-current-month .numInputWrapper span {
+  position: absolute;
+  right: 2px;
+  width: 20px;
+  height: 50%;
+  padding: 0;
+  opacity: 1; /* always visible on purple header */
+  border: none;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+.flatpickr-current-month .numInputWrapper span:hover {
+  background: rgba(255, 255, 255, .22);
+}
+.flatpickr-current-month .numInputWrapper span.arrowUp {
+  top: 0;
+  border-radius: 6px 6px 0 0;
+}
+.flatpickr-current-month .numInputWrapper span.arrowDown {
+  top: 50%;
+  border-radius: 0 0 6px 6px;
+}
+.flatpickr-current-month .numInputWrapper span:after {
+  display: block;
+  content: "";
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+}
+.flatpickr-current-month .numInputWrapper span.arrowUp:after {
+  top: 55%;
+  transform: translate(-50%, -50%);
+  border-bottom: 6px solid #fff;
+  border-top: 0;
+}
+.flatpickr-current-month .numInputWrapper span.arrowDown:after {
+  top: 45%;
+  transform: translate(-50%, -50%);
+  border-top: 6px solid #fff;
+  border-bottom: 0;
+}
+.flatpickr-current-month .numInputWrapper span svg path {
+  fill: #fff;
 }
 .flatpickr-months .flatpickr-prev-month,
 .flatpickr-months .flatpickr-next-month {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  height: 36px;
-  width: 36px;
+  height: 40px;
+  width: 40px;
   padding: 0;
   margin: 0;
   display: inline-flex;
@@ -782,15 +874,15 @@ input.js-date.flatpickr-input:not(.flatpickr-alt) {
   line-height: 1;
 }
 .flatpickr-months .flatpickr-prev-month {
-  left: 6px;
+  left: 4px;
 }
 .flatpickr-months .flatpickr-next-month {
-  right: 6px;
+  right: 4px;
 }
 .flatpickr-months .flatpickr-prev-month svg,
 .flatpickr-months .flatpickr-next-month svg {
-  width: 14px;
-  height: 14px;
+  width: 18px;
+  height: 18px;
   fill: #fff;
   vertical-align: middle;
 }
