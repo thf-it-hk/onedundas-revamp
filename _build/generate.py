@@ -19,29 +19,51 @@ try:
 except ImportError:
     Image = None
 
-def t(en, zh):
-    """Bilingual inline span pair."""
-    return f'<span class="i18n-en" data-i18n-en>{en}</span><span class="i18n-zh" data-i18n-zh lang="zh-Hant">{zh}</span>'
+# Traditional → Simplified for zh-Hans (third language). Prefer explicit zh_hans when nuance matters.
+try:
+    from opencc import OpenCC
+    _TO_HANS = OpenCC("t2s").convert
+except ImportError:
+    def _TO_HANS(s):
+        return s
 
-def opt(value, en, zh, selected=False):
+def to_hans(s):
+    return _TO_HANS(s) if s else s
+
+def t(en, zh, zh_hans=None):
+    """Trilingual inline spans: EN / 繁 (zh-Hant) / 简 (zh-Hans)."""
+    if zh_hans is None:
+        zh_hans = to_hans(zh)
+    return (
+        f'<span class="i18n-en" data-i18n-en>{en}</span>'
+        f'<span class="i18n-zh" data-i18n-zh lang="zh-Hant">{zh}</span>'
+        f'<span class="i18n-zh-hans" data-i18n-zh-hans lang="zh-Hans">{zh_hans}</span>'
+    )
+
+def opt(value, en, zh, zh_hans=None, selected=False):
     """Select option with data-label-* for JS language switching (spans inside <option> are ignored by browsers)."""
+    if zh_hans is None:
+        zh_hans = to_hans(zh)
     sel = " selected" if selected else ""
-    return f'<option value="{value}" data-label-en="{en}" data-label-zh="{zh}"{sel}>{en}</option>'
+    return (
+        f'<option value="{value}" data-label-en="{en}" data-label-zh="{zh}" '
+        f'data-label-zh-hans="{zh_hans}"{sel}>{en}</option>'
+    )
 
 HEADER = '''<!DOCTYPE html>
 <html lang="en" data-lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title data-title-en="{title_en}" data-title-zh="{title_zh}">{title_en}</title>
+  <title data-title-en="{title_en}" data-title-zh="{title_zh}" data-title-zh-hans="{title_zh_hans}">{title_en}</title>
   <meta name="description" content="{desc}">
 {seo}
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400;1,9..40,500&family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400;1,9..40,500&family=Noto+Sans+TC:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.css">
   <link rel="stylesheet" href="assets/css/styles.css">
-  <link rel="icon" href="assets/images/logo-sm.png">
+  <link rel="icon" href="assets/images/favicon.png" type="image/png">
 {preload}
 </head>
 <body>
@@ -49,7 +71,7 @@ HEADER = '''<!DOCTYPE html>
   <header class="site-header">
     <div class="container header-inner">
       <a class="brand" href="index.html" aria-label="One Dundas home">
-        <img src="assets/images/logo-sm.png" width="78" height="73" alt="One Dundas logo">
+        <img src="assets/images/logo-header.png" width="96" height="88" alt="One Dundas logo">
         <span class="visually-hidden">One Dundas</span>
       </a>
       <button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="site-nav" aria-label="Menu">
@@ -68,8 +90,9 @@ HEADER = '''<!DOCTYPE html>
           <div class="lang-switch" role="group" aria-label="Language">
             <button type="button" data-lang-btn="en" aria-pressed="true">EN</button>
             <button type="button" data-lang-btn="zh" aria-pressed="false">繁</button>
+            <button type="button" data-lang-btn="zh-Hans" aria-pressed="false">简</button>
           </div>
-          <a class="btn btn--primary" href="{book}" data-book-now target="_blank" rel="noopener noreferrer">{book_label}</a>
+          <a class="btn btn--primary" href="{book}" data-book-now>{book_label}</a>
         </div>
       </nav>
     </div>
@@ -83,7 +106,6 @@ FOOTER = '''
     <div class="container footer-grid">
       <div class="footer-brand">
         <strong>One Dundas 壹登</strong>
-        <p class="footer-meta">{footer_meta}</p>
         <p>1 Dundas Street, Mongkok, Kowloon, Hong Kong<br>九龍旺角登打士街1號</p>
         <p>
           <a href="tel:+85227001122">+852 2700 1122</a><br>
@@ -105,7 +127,7 @@ FOOTER = '''
           <li><a href="gallery.html">{gallery}</a></li>
           <li><a href="virtual-tour.html">{vtour}</a></li>
           <li><a href="contact.html">{contact}</a></li>
-          <li><a href="{book}" target="_blank" rel="noopener noreferrer">{book_label}</a></li>
+          <li><a href="{book}" data-book-now>{book_label}</a></li>
         </ul>
       </nav>
       <nav class="footer-col" aria-label="Footer legal">
@@ -120,8 +142,10 @@ FOOTER = '''
       <span>© 2026 One Dundas. All rights reserved.</span>
     </div>
   </footer>
+  {book_choice}
   <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/l10n/zh-tw.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/l10n/zh.js" defer></script>
   <script src="assets/js/main.js" defer></script>
 </body>
 </html>
@@ -144,10 +168,31 @@ NAV = {
     "legal": t("LEGAL", "法律資訊"),
     "privacy": t("PRIVACY", "私隱政策"),
     "disclaimer": t("DISCLAIMER", "免責聲明"),
-    # Short location meta only — do NOT restore removed「旺角服務式公寓」/「Serviced apartments in Mongkok」tagline
-    "footer_meta": t("Mongkok · Dundas Street", "旺角 · 登打士街"),
     "book": BOOK,
 }
+
+BOOK_CHOICE = f"""
+<div class="book-choice" id="book-choice" hidden data-book-choice>
+  <div class="book-choice__backdrop" data-book-choice-close tabindex="-1"></div>
+  <div class="book-choice__panel" role="dialog" aria-modal="true" aria-labelledby="book-choice-title">
+    <button type="button" class="book-choice__close" data-book-choice-close aria-label="Close">&times;</button>
+    <p class="eyebrow" id="book-choice-title">{t("Stay with us", "入住選擇")}</p>
+    <h2>{t("How would you like to book?", "您想如何預訂？")}</h2>
+    <div class="book-choice__options">
+      <button type="button" class="book-choice__opt" data-book-choice-daily>
+        <strong>{t("Daily stay", "日租")}</strong>
+        <span class="book-choice__desc">{t("Short stays — book online instantly", "短期住宿 — 網上即時預訂")}</span>
+        <span class="btn btn--accent btn--block">{t("Book now", "立即預訂")}</span>
+      </button>
+      <button type="button" class="book-choice__opt" data-book-choice-monthly>
+        <strong>{t("Monthly stay", "月租")}</strong>
+        <span class="book-choice__desc">{t("Longer stays (28+ nights) — send an enquiry", "較長住期（28晚或以上）— 提交查詢")}</span>
+        <span class="btn btn--primary btn--block">{t("Enquire now", "立即查詢")}</span>
+      </button>
+    </div>
+  </div>
+</div>
+"""
 
 def page(title_en, title_zh, desc, body, name="index.html", crumb="Home", noindex=False):
     url = SITE_URL if name == "index.html" else SITE_URL + name
@@ -165,6 +210,7 @@ def page(title_en, title_zh, desc, body, name="index.html", crumb="Home", noinde
         '  <meta property="og:image:alt" content="One Dundas building exterior, 1 Dundas Street, Mongkok">',
         '  <meta property="og:locale" content="en_HK">',
         '  <meta property="og:locale:alternate" content="zh_HK">',
+        '  <meta property="og:locale:alternate" content="zh_CN">',
         '  <meta name="twitter:card" content="summary_large_image">',
         f'  <meta name="twitter:title" content="{title_en}">',
         f'  <meta name="twitter:description" content="{desc}">',
@@ -176,7 +222,7 @@ def page(title_en, title_zh, desc, body, name="index.html", crumb="Home", noinde
         items.append({"@type": "ListItem", "position": 2, "name": crumb, "item": url})
     graph.append({"@type": "BreadcrumbList", "@id": url + "#breadcrumb", "itemListElement": items})
     graph.append({"@type": "WebPage", "@id": url + "#webpage", "url": url, "name": title_en,
-                  "description": desc, "inLanguage": ["en", "zh-Hant"], "isPartOf": {"@id": SITE_URL + "#website"},
+                  "description": desc, "inLanguage": ["en", "zh-Hant", "zh-Hans"], "isPartOf": {"@id": SITE_URL + "#website"},
                   "breadcrumb": {"@id": url + "#breadcrumb"}})
     if name == "contact.html":
         graph.append(FAQ_LD)
@@ -188,8 +234,9 @@ def page(title_en, title_zh, desc, body, name="index.html", crumb="Home", noinde
     preload = ''
     if name == "index.html":
         preload = '  <link rel="preload" as="image" href="assets/images/hero-lobby.jpg" fetchpriority="high">'
-    head = HEADER.format(title_en=title_en, title_zh=title_zh, desc=desc, seo="\n".join(seo), preload=preload, **NAV)
-    foot = FOOTER.format(**NAV)
+    title_zh_hans = to_hans(title_zh)
+    head = HEADER.format(title_en=title_en, title_zh=title_zh, title_zh_hans=title_zh_hans, desc=desc, seo="\n".join(seo), preload=preload, **NAV)
+    foot = FOOTER.format(book_choice=BOOK_CHOICE, **NAV)
     return head + body + foot
 
 _SIZES = {}
@@ -308,7 +355,10 @@ def _img(p):
     return im
 
 def _tx(p, k):
-    return t(E(p.get(k + "_en")), E(p.get(k + "_zh") or p.get(k + "_en")))
+    en = E(p.get(k + "_en"))
+    zh = E(p.get(k + "_zh") or p.get(k + "_en"))
+    zh_hans = E(p.get(k + "_zh_hans")) if p.get(k + "_zh_hans") else None
+    return t(en, zh, zh_hans)
 
 def _code(p):
     return f'<p>{t("Promo code:", "折扣碼：")} <span class="promo-code">{E(p["code"])}</span></p>' if p.get("code") else ""
@@ -361,7 +411,7 @@ def _promo_card(p):
         {_code(p)}
         {_date_line(p)}
         <div class="btn-row">
-          <a class="btn btn--accent" href="{link}" data-book-now target="_blank" rel="noopener noreferrer">{t("Book Now", "立即預訂")}</a>
+          <a class="btn btn--accent" href="{link}" data-book-now>{t("Book Now", "立即預訂")}</a>
           <a class="btn btn--ghost" style="border-color:#fff;color:#fff" href="tel:+85227001122">{t("Call leasing", "致電租務部")}</a>
         </div>
       </div>
@@ -375,7 +425,7 @@ else:
     _cards = f"""<div style="max-width:48rem">
       <h2>{t("No current promotions", "暫時未有推廣優惠")}</h2>
       <p>{t("There are no promotions running at the moment. Please check back soon, or contact Leasing at +852 2700 1122 or leasing@onedundashk.com for our latest rates.", "目前未有推廣優惠，敬請留意。如欲查詢最新租金，請致電 +852 2700 1122 或電郵 leasing@onedundashk.com 與租務部聯絡。")}</p>
-      <div class="btn-row"><a class="btn btn--accent" href="{BOOK}" data-book-now target="_blank" rel="noopener noreferrer">{t("Book Now", "立即預訂")}</a></div>
+      <div class="btn-row"><a class="btn btn--accent" href="{BOOK}" data-book-now>{t("Book Now", "立即預訂")}</a></div>
     </div>"""
 
 PROMO_PAGE = f"""
@@ -433,7 +483,7 @@ index_body = f'''
     <h1>{t("Your home in the heart of Kowloon", "九龍核心的​都市居所")}</h1>
     <p class="lead">{t("109 stylish Studio, One-Bedroom and Two-Bedroom apartments at 1 Dundas Street — steps from Mongkok’s markets, MTR and city life.", "壹登提供109間時尚開放式、單卧室及雙卧室公寓，位於登打士街1號，步行即達旺角市集、港鐵與繁華街景。")}</p>
     <div class="btn-row">
-      <a class="btn btn--accent" href="{BOOK}" data-book-now target="_blank" rel="noopener noreferrer">{t("Book Now", "立即預訂")}</a>
+      <a class="btn btn--accent" href="{BOOK}" data-book-now>{t("Book Now", "立即預訂")}</a>
       <a class="btn btn--light" href="contact.html">{t("Enquire", "立即查詢")}</a>
     </div>
     {AVAIL}
@@ -451,7 +501,7 @@ index_body = f'''
       <article class="card card--room card--room-a">
         <img src="assets/images/studio-a.jpg" alt="Studio apartment at One Dundas with queen bed and city view">
         <div class="card__body">
-          <h3>{t("Studio", "開放式公寓")}</h3>
+          <h3>{t("Studio Apartment", "開放式公寓")}</h3>
           <p class="card__meta">249–280 sq ft · 19–29/F</p>
           <p>{t("Compact and cosy with city views, queen bed and well-equipped kitchenette.", "舒適精巧，飽覽城市景觀，配備加大雙人床與設備齊全的廚房。")}</p>
           <a class="btn btn--ghost" href="accommodation.html#studio">{t("Studio details", "開放式詳情")}</a>
@@ -460,7 +510,7 @@ index_body = f'''
       <article class="card card--room card--room-b">
         <img src="assets/images/1br-living.jpg" alt="One-bedroom apartment living area at One Dundas">
         <div class="card__body">
-          <h3>{t("One-Bedroom", "單卧室公寓")}</h3>
+          <h3>{t("One-Bedroom Apartment", "單卧室公寓")}</h3>
           <p class="card__meta">437–479 sq ft · 19–35/F</p>
           <p>{t("Separate bedroom and living area with work space and harbour or city views.", "獨立睡房與客廳，設工作區，可賞海景或城市景觀。")}</p>
           <a class="btn btn--ghost" href="accommodation.html#one-bedroom">{t("One-Bedroom details", "單卧室詳情")}</a>
@@ -469,7 +519,7 @@ index_body = f'''
       <article class="card card--room card--room-c">
         <img src="assets/images/twobed-living.jpg" alt="Two-bedroom apartment living room at One Dundas">
         <div class="card__body">
-          <h3>{t("Two-Bedroom", "雙卧室公寓")}</h3>
+          <h3>{t("Two-Bedroom Apartment", "雙卧室公寓")}</h3>
           <p class="card__meta">544 sq ft · 19–35/F</p>
           <p>{t("Master suite plus guest room, in-room washer & dryer — ideal for families.", "主人房連套房浴室與客房，房內洗衣乾衣機，適合家庭。")}</p>
           <a class="btn btn--ghost" href="accommodation.html#two-bedroom">{t("Two-Bedroom details", "雙卧室詳情")}</a>
@@ -487,7 +537,7 @@ index_body = f'''
       <p class="lead">{t("Set on the residential side of Mongkok yet moments from Langham Place, Ladies’ Market and Mongkok MTR.", "座落旺角住宅區一側，步行即達朗豪坊、女人街與旺角港鐵站。")}</p>
       <ul class="feature-list feature-list--ranked">
         <li>{t("109 apartments across Studio / 1BR / 2BR", "109間開放式／單卧／雙卧公寓")}</li>
-        <li>{t("Housekeeping twice weekly · linen weekly", "每週兩次清潔 · 每週更換床單")}</li>
+        <li>{t("Housekeeping twice weekly · linen change weekly", "每週兩次清潔 · 每週更換床單")}</li>
         <li>{t("Outdoor leisure area & gym · BBQ rental", "戶外休憩與健身設施 · 燒烤爐租用")}</li>
         <li>{t("Rates inclusive of management, rates & utilities", "租金已包括管理費、差餉及水電空調")}</li>
         <li>{t("Non-smoking green living", "全幢禁煙綠色生活")}</li>
@@ -520,7 +570,7 @@ index_body = f'''
     <h2>{t("Ready to stay?", "準備入住？")}</h2>
     <p class="lead" style="margin-inline:auto;color:rgba(255,255,255,.9)">{t("Book direct online or speak with our leasing team.", "網上直接預訂，或聯絡租務團隊。")}</p>
     <div class="btn-row" style="justify-content:center">
-      <a class="btn btn--accent" href="{BOOK}" data-book-now target="_blank" rel="noopener noreferrer">{t("Book Now", "立即預訂")}</a>
+      <a class="btn btn--accent" href="{BOOK}" data-book-now>{t("Book Now", "立即預訂")}</a>
       <a class="btn btn--light" href="contact.html">{t("Send an enquiry", "提交查詢")}</a>
     </div>
   </div>
@@ -558,21 +608,10 @@ about_body = f'''
     <ul class="feature-list" style="margin-top:2rem;max-width:40rem">
       <li>{t("Self-service laundry (washer & dryer)", "自助洗衣設施（洗衣機及乾衣機）")}</li>
       <li>{t("BBQ facilities rental · car parking rental", "燒烤爐租用 · 泊車位租用")}</li>
-      <li>{t("Housekeeping twice a week (except Sundays); linen weekly", "每週兩次清潔（星期日除外）；每週更換床單")}</li>
+      <li>{t("Housekeeping service twice a week (except Sundays); linen change once a week", "每週兩次清潔服務（星期日除外）；床單每週更換一次")}</li>
       <li>{t("Complimentary Wi-Fi and in-room internet", "免費 Wi-Fi 及室內上網")}</li>
       <li>{t("Non-smoking property", "全幢禁煙")}</li>
     </ul>
-  </div>
-</section>
-<section class="section">
-  <div class="container">
-    <h2>{t("Contact leasing", "聯絡租務")}</h2>
-    <p>{t("For business and leasing enquiries, please use:", "商務及租務查詢請聯絡：")}</p>
-    <div class="contact-stack" style="max-width:28rem;margin-top:1rem">
-      <div class="contact-item"><strong>{t("Phone", "電話")}</strong><a href="tel:+85227001122">+852 2700 1122</a></div>
-      <div class="contact-item"><strong>{t("Email", "電郵")}</strong><a href="mailto:leasing@onedundashk.com">leasing@onedundashk.com</a></div>
-      <div class="contact-item"><strong>{t("Address", "地址")}</strong>1 Dundas Street, Mongkok, Kowloon, Hong Kong<br>香港九龍旺角登打士街1號</div>
-    </div>
   </div>
 </section>
 '''
@@ -611,7 +650,7 @@ def room_block(anchor, title_en, title_zh, img, size, bed, occ, storey, desc_en,
         <li>{t("Complimentary Wi-Fi · local calls with direct line", "免費 Wi-Fi · 直撥本地電話")}</li>
       </ul>
       <div class="btn-row">
-        <a class="btn btn--primary" href="{BOOK}" data-book-now target="_blank" rel="noopener noreferrer">{t("Book Now", "立即預訂")}</a>
+        <a class="btn btn--primary" href="{BOOK}" data-book-now>{t("Book Now", "立即預訂")}</a>
         <a class="btn btn--ghost" href="contact.html">{t("Enquire", "查詢")}</a>
       </div>
     </div>
@@ -625,9 +664,9 @@ accom_body = f'''
     <h1 class="eyebrow">{t("Accommodation", "住宿")}</h1>
     <p class="lead">{t("One Dundas consists of 109 well-appointed Studio, One-Bedroom and Two-Bedroom apartments.", "壹登精心打造了109間設施齊全的開放式、單卧室及雙卧室公寓。")}</p>
     <ul class="pill-list">
-      <li><a href="#studio" style="text-decoration:none;color:inherit">{t("Studio", "開放式")}</a></li>
-      <li><a href="#one-bedroom" style="text-decoration:none;color:inherit">{t("One-Bedroom", "單卧室")}</a></li>
-      <li><a href="#two-bedroom" style="text-decoration:none;color:inherit">{t("Two-Bedroom", "雙卧室")}</a></li>
+      <li><a href="#studio" style="text-decoration:none;color:inherit">{t("Studio Apartment", "開放式公寓")}</a></li>
+      <li><a href="#one-bedroom" style="text-decoration:none;color:inherit">{t("One-Bedroom Apartment", "單卧室公寓")}</a></li>
+      <li><a href="#two-bedroom" style="text-decoration:none;color:inherit">{t("Two-Bedroom Apartment", "雙卧室公寓")}</a></li>
     </ul>
   </div>
 </section>
@@ -793,7 +832,7 @@ vtour_body = f'''
     <div class="btn-row" style="justify-content:center">
       <a class="btn btn--ghost" href="gallery.html">{t("View photos", "查看相片")}</a>
       <a class="btn btn--primary" href="contact.html">{t("Request a viewing", "預約參觀")}</a>
-      <a class="btn btn--accent" href="{BOOK}" data-book-now target="_blank" rel="noopener noreferrer">{t("Book Now", "立即預訂")}</a>
+      <a class="btn btn--accent" href="{BOOK}" data-book-now>{t("Book Now", "立即預訂")}</a>
     </div>
   </div>
 </section>
@@ -818,7 +857,7 @@ contact_body = f'''
       <div class="form-error" data-enquiry-error tabindex="-1" role="alert">
         {t('Sorry, your enquiry could not be sent. Please email <a href="mailto:leasing@onedundashk.com">leasing@onedundashk.com</a> or call <a href="tel:+85227001122">+852 2700 1122</a>.', '抱歉，查詢未能送出。請電郵 <a href="mailto:leasing@onedundashk.com">leasing@onedundashk.com</a> 或致電 <a href="tel:+85227001122">+852 2700 1122</a>。')}
       </div>
-      <form data-enquiry-form novalidate action="{WEB3FORMS_ENDPOINT}" method="post">
+      <form id="enquiry-form" data-enquiry-form novalidate action="{WEB3FORMS_ENDPOINT}" method="post">
         <input type="hidden" name="access_key" value="{WEB3FORMS_ACCESS_KEY}">
         <input type="hidden" name="subject" value="New enquiry from onedundashk.com website">
         <input type="hidden" name="from_name" value="One Dundas Website">
@@ -931,7 +970,7 @@ contact_body = f'''
       <div class="contact-item">
         <strong>{t("Book direct", "網上直訂")}</strong>
         <p class="muted">{t("Check live availability on SiteMinder Direct.", "於 SiteMinder Direct 查詢即時空房。")}</p>
-        <a class="btn btn--accent" style="margin-top:.75rem" href="{BOOK}" data-book-now target="_blank" rel="noopener noreferrer">{t("Book Now", "立即預訂")}</a>
+        <a class="btn btn--accent" style="margin-top:.75rem" href="{BOOK}" data-book-now>{t("Book Now", "立即預訂")}</a>
       </div>
       <div class="avail-bar avail-bar--stacked" style="box-shadow:none;border:1px solid var(--line);padding:1rem">
         <p style="margin:0 0 .75rem;font-weight:700">{t("Quick availability", "快速查房")}</p>
@@ -959,8 +998,8 @@ FAQS = [
      "有哪些房型？", "共109間服務式公寓：開放式（249–280平方呎，最多2人）、單卧室（437–479平方呎，最多2人）及雙卧室（544平方呎，最多3人）。"),
     ("What is included in the rent?", "Rates include property management fee and service charges, government rates and taxes, and utilities (water, electricity and air-conditioning).",
      "租金包括甚麼？", "租金已包括物業管理費及服務費、差餉及稅項，以及水、電及空調費用。"),
-    ("Is housekeeping provided?", "Yes. Housekeeping is provided twice a week (except Sundays) and linen is changed weekly.",
-     "有沒有清潔服務？", "有。每週兩次清潔（星期日除外），每週更換床單。"),
+    ("Is housekeeping provided?", "Yes. Housekeeping service is provided twice a week (except Sundays); linen is changed once a week.",
+     "有沒有清潔服務？", "有。每週兩次清潔服務（星期日除外）；床單每週更換一次。"),
     ("What facilities does One Dundas have?", "Outdoor gym and leisure area, self-service laundry, BBQ facilities rental, car parking rental, 24/7 concierge and security, and complimentary Wi-Fi. The building is non-smoking.",
      "有甚麼設施？", "戶外健身及休憩區、自助洗衣、燒烤爐租用、泊車位租用、24小時禮賓及保安，以及免費 Wi-Fi。全幢禁煙。"),
     ("Which universities are nearby?", "One Dundas offers convenient transport to The Hong Kong Polytechnic University, City University of Hong Kong, Hong Kong Baptist University and Hong Kong Metropolitan University.",
@@ -988,7 +1027,7 @@ ORG = {"@type": "Organization", "@id": SITE_URL + "#organization", "name": "One 
        "url": SITE_URL, "logo": SITE_URL + "assets/images/logo.png", "email": "leasing@onedundashk.com",
        "telephone": "+852 2700 1122", "address": ADDRESS}
 WEBSITE = {"@type": "WebSite", "@id": SITE_URL + "#website", "url": SITE_URL, "name": "One Dundas",
-           "inLanguage": ["en", "zh-Hant"], "publisher": {"@id": SITE_URL + "#organization"}}
+           "inLanguage": ["en", "zh-Hant", "zh-Hans"], "publisher": {"@id": SITE_URL + "#organization"}}
 _AMEN = ["Outdoor gym", "Outdoor leisure area", "Self-service laundry", "BBQ facilities rental", "Car parking rental",
          "Housekeeping twice weekly", "Weekly linen change", "Complimentary Wi-Fi", "24/7 concierge and security",
          "Kitchenette", "4K smart TV", "Electronic safe", "Non-smoking property"]
@@ -1068,7 +1107,7 @@ links = "\n".join(f"- [{te}]({SITE_URL if n == 'index.html' else SITE_URL + n}):
 faq_md = "\n".join(f"- **{q}** {a}" for q, a, _, _ in FAQS)
 (ROOT / "llms.txt").write_text(f"""# One Dundas Serviced Apartments (壹登)
 
-> 109 serviced Studio, One-Bedroom and Two-Bedroom apartments at 1 Dundas Street, Mongkok, Kowloon, Hong Kong (香港九龍旺角登打士街1號). Bilingual site (English / 繁體中文).
+> 109 serviced Studio, One-Bedroom and Two-Bedroom apartments at 1 Dundas Street, Mongkok, Kowloon, Hong Kong (香港九龍旺角登打士街1號). Trilingual site (English / 繁體中文 / 简体中文).
 
 ## Key facts
 - Address: 1 Dundas Street, Mongkok, Kowloon, Hong Kong

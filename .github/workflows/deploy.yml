@@ -19,7 +19,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: { python-version: "3.12" }
-      - run: pip install pillow
+      - run: pip install -r _build/requirements.txt
       - name: Generate pages (Hong Kong date)
         run: BUILD_DATE=$(TZ=Asia/Hong_Kong date +%F) python _build/generate.py
       - name: Assemble publish folder

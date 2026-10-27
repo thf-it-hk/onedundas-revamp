@@ -1,26 +1,27 @@
 # One Dundas — Static Site Revamp
 
-Modern bilingual (Traditional Chinese + English) static rebuild of [onedundashk.com](https://onedundashk.com/) for Sunny Leung.
+Modern trilingual (English / Traditional Chinese / Simplified Chinese) static rebuild of [onedundashk.com](https://onedundashk.com/) for Sunny Leung. Preview: https://thf-it-hk.github.io/onedundas-revamp/
 
 **Does not touch production.** This folder is a standalone static site.
 
 ## Stack
 
 - Plain HTML / CSS / JS (no build step required)
-- Date pickers: **Flatpickr** 4.6 (CDN) themed to purple `#6b2d7b` / orange `#fb8e03` / DM Sans; EN + 繁 (`zh_tw`) locales; values stay `YYYY-MM-DD` for SiteMinder
-- Shared design system: purple brand (`#87768b` / `#6b2d7b`), **DM Sans** (Latin/English) + **Noto Sans TC** (Traditional Chinese)
-- Header brand shows **logo image only** (transparent `assets/images/logo.png`); accessible name via `alt` + `.visually-hidden`
+- Date pickers: **Flatpickr** 4.6 (CDN); EN + 繁 (`zh_tw`) + 简 (`zh`) locales; values stay `YYYY-MM-DD` for SiteMinder
+- Shared design system: purple brand (`#87768b` / `#6b2d7b`), **DM Sans** + **Noto Sans TC** + **Noto Sans SC**
+- Header brand: new full logo `assets/images/logo-header.png` (from `logo-full.png`); favicon `favicon.png`
 - Top nav labels use CSS `text-transform: uppercase` (EN); Chinese unaffected
-- Language switch via `localStorage` + `html[lang]` (EN / 繁) — separate strings, not mid-sentence WPML stacking
+- Language switch via `localStorage` + `?lang=` + `html[lang]` (EN / 繁 / 简) — trilingual spans from `t()` in generate.py
+- **Book now** opens daily vs monthly choice (SiteMinder vs Enquiry). Availability bar: &lt;28 nights → SiteMinder, ≥28 → Enquiry with date query params
 - Images downloaded under `assets/images/` for offline preview
 
 
 ## Language default
 
-- **First visit** (no `localStorage` key `onedundas-lang`): default **English**.
-- If `navigator.language` / `navigator.languages` indicates Chinese (`zh-HK`, `zh-TW`, `zh-Hant`, and optionally `zh-CN` / `zh` / `zh-Hans`), start in **繁**.
-- After the user toggles EN / 繁, the choice is stored in `localStorage` (`onedundas-lang` = `en` or `zh-Hant`) and reused on later visits.
-- Implementation: `assets/js/main.js` → `prefersChineseFromSystem()` + `initLang()`.
+- **First visit** (no `localStorage` / `?lang=`): default **English**.
+- Browser locale: `zh-CN` / `zh-Hans` / `zh-SG` → **简**; `zh-HK` / `zh-TW` / `zh-Hant` / bare `zh` → **繁**.
+- Toggle stores `onedundas-lang` = `en` | `zh-Hant` | `zh-Hans` and mirrors `?lang=` in the URL (same HTML pages — not separate folders).
+- Simplified strings are OpenCC `t2s` from Traditional at generate time (optional `*_zh_hans` in promotions JSON overrides).
 
 ## Pages
 
@@ -118,6 +119,7 @@ Optional: add `_redirects` (Netlify) or `public/_routes.json` only if you later 
 Shared header/footer live in `_build/generate.py`. After editing copy there:
 
 ```bash
+pip install -r _build/requirements.txt   # pillow + opencc-python-reimplemented
 python3 _build/generate.py
 ```
 
@@ -134,6 +136,6 @@ python3 _build/generate.py
 ## Brand notes
 
 - Purple primary from legacy theme: `#87768b`, deep CTA `#6b2d7b`, accent orange `#fb8e03`
-- Fonts: DM Sans + Noto Sans TC (Google Fonts HTTPS, weights 400/500/600/700); button text uses dark on light/orange/white and light only on deep purple
+- Fonts: DM Sans + Noto Sans TC + Noto Sans SC (Google Fonts HTTPS, weights 400/500/600/700)
 - Address: 1 Dundas Street, Mongkok, Kowloon, Hong Kong
 - ~109 units: Studio / 1BR / 2BR

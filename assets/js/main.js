@@ -11,40 +11,68 @@
     return Array.prototype.slice.call((root || document).querySelectorAll(sel));
   }
 
-  /* ---------- Language ---------- */
-  function applySelectOptions(langKey) {
-    // <option> cannot host spans; labels live in data-label-en / data-label-zh
+  /* ---------- Language (en / zh-Hant / zh-Hans) ---------- */
+  function normalizeLang(lang) {
+    if (!lang) return "en";
+    var raw = String(lang).toLowerCase().replace(/_/g, "-");
+    if (raw === "zh-hans" || raw === "zh-cn" || raw === "zh-sg" || raw === "zh-my") return "zh-Hans";
+    if (raw === "zh" || raw === "zh-hant" || raw === "zh-hk" || raw === "zh-tw" || raw === "zh-mo") return "zh-Hant";
+    if (raw === "en" || raw.indexOf("en-") === 0) return "en";
+    return "en";
+  }
+
+  function langKeyFromNormalized(normalized) {
+    if (normalized === "zh-Hans") return "zh-Hans";
+    if (normalized === "zh-Hant") return "zh";
+    return "en";
+  }
+
+  function applySelectOptions(normalized) {
     $all("select option[data-label-en]").forEach(function (opt) {
       var en = opt.getAttribute("data-label-en") || "";
       var zh = opt.getAttribute("data-label-zh") || en;
-      opt.textContent = langKey === "zh" ? zh : en;
+      var hans = opt.getAttribute("data-label-zh-hans") || zh;
+      if (normalized === "zh-Hans") opt.textContent = hans;
+      else if (normalized === "zh-Hant") opt.textContent = zh;
+      else opt.textContent = en;
     });
   }
 
   function applyLang(lang) {
-    var normalized = lang === "zh" || lang === "zh-Hant" ? "zh-Hant" : "en";
-    var langKey = normalized === "zh-Hant" ? "zh" : "en";
+    var normalized = normalizeLang(lang);
+    var langKey = langKeyFromNormalized(normalized);
     document.documentElement.lang = normalized;
     document.documentElement.setAttribute("data-lang", langKey);
     try { localStorage.setItem(STORAGE_LANG, normalized); } catch (e) {}
+    // Keep URL shareable without breaking existing bookmarks
+    try {
+      var url = new URL(location.href);
+      if (url.searchParams.get("lang") !== normalized) {
+        url.searchParams.set("lang", normalized);
+        history.replaceState(null, "", url.pathname + url.search + url.hash);
+      }
+    } catch (e) {}
     $all("[data-lang-btn]").forEach(function (btn) {
-      var isActive = btn.getAttribute("data-lang-btn") === langKey;
+      var btnLang = normalizeLang(btn.getAttribute("data-lang-btn"));
+      var isActive = btnLang === normalized;
       btn.setAttribute("aria-pressed", isActive ? "true" : "false");
     });
-    // Update document title if bilingual titles provided
     var titleEl = document.querySelector("title");
     if (titleEl) {
       var en = titleEl.getAttribute("data-title-en");
       var zh = titleEl.getAttribute("data-title-zh");
-      if (en && zh) titleEl.textContent = normalized === "zh-Hant" ? zh : en;
+      var hans = titleEl.getAttribute("data-title-zh-hans") || zh;
+      if (en && zh) {
+        if (normalized === "zh-Hans") titleEl.textContent = hans || zh;
+        else if (normalized === "zh-Hant") titleEl.textContent = zh;
+        else titleEl.textContent = en;
+      }
     }
-    applySelectOptions(langKey);
+    applySelectOptions(normalized);
     refreshFlatpickrLocales();
   }
 
-  function prefersChineseFromSystem() {
-    // First visit only: EN by default; switch to 繁 when browser locale is Chinese.
-    // Matches zh-HK / zh-TW / zh-Hant, and optionally zh-CN / zh / zh-Hans.
+  function prefersLangFromSystem() {
     var list = [];
     try {
       if (navigator.languages && navigator.languages.length) {
@@ -56,31 +84,37 @@
     for (var i = 0; i < list.length; i++) {
       var raw = String(list[i] || "").toLowerCase().replace(/_/g, "-");
       if (!raw) continue;
+      if (raw.indexOf("zh-cn") === 0 || raw.indexOf("zh-hans") === 0 || raw.indexOf("zh-sg") === 0) {
+        return "zh-Hans";
+      }
       if (
         raw === "zh" ||
         raw.indexOf("zh-hk") === 0 ||
         raw.indexOf("zh-tw") === 0 ||
         raw.indexOf("zh-hant") === 0 ||
-        raw.indexOf("zh-cn") === 0 ||
-        raw.indexOf("zh-hans") === 0 ||
-        raw.indexOf("zh-mo") === 0 ||
-        raw.indexOf("zh-sg") === 0
+        raw.indexOf("zh-mo") === 0
       ) {
-        return true;
+        return "zh-Hant";
       }
     }
-    return false;
+    return "en";
   }
 
   function initLang() {
     var saved = null;
+    var fromQuery = null;
+    try {
+      var q = new URL(location.href).searchParams.get("lang");
+      if (q) fromQuery = normalizeLang(q);
+    } catch (e) {}
     try { saved = localStorage.getItem(STORAGE_LANG); } catch (e) {}
     var initial;
-    if (saved === "en" || saved === "zh-Hant" || saved === "zh") {
-      initial = saved;
+    if (fromQuery) {
+      initial = fromQuery;
+    } else if (saved === "en" || saved === "zh-Hant" || saved === "zh-Hans" || saved === "zh") {
+      initial = normalizeLang(saved);
     } else {
-      // No stored preference: English default, or 繁 if system language is Chinese
-      initial = prefersChineseFromSystem() ? "zh-Hant" : "en";
+      initial = prefersLangFromSystem();
     }
     applyLang(initial);
     $all("[data-lang-btn]").forEach(function (btn) {
@@ -128,14 +162,20 @@
     return x;
   }
 
+  function currentLang() {
+    return normalizeLang(document.documentElement.lang || "en");
+  }
+
   function isZhLang() {
-    return document.documentElement.lang === "zh-Hant";
+    var l = currentLang();
+    return l === "zh-Hant" || l === "zh-Hans";
   }
 
   function fpLocale() {
-    if (isZhLang() && window.flatpickr && flatpickr.l10ns && flatpickr.l10ns.zh_tw) {
-      return flatpickr.l10ns.zh_tw;
-    }
+    if (!window.flatpickr || !flatpickr.l10ns) return "default";
+    var l = currentLang();
+    if (l === "zh-Hans" && flatpickr.l10ns.zh) return flatpickr.l10ns.zh;
+    if (l === "zh-Hant" && flatpickr.l10ns.zh_tw) return flatpickr.l10ns.zh_tw;
     return "default";
   }
 
@@ -173,8 +213,8 @@
     setInputMin(checkOutEl, minOut);
     var cout = parseISODate(checkOutEl.value);
     if (!cout || cout <= cin) {
-      // Default to ~30 nights for serviced apartments / monthly stays
-      setInputDate(checkOutEl, addDays(cin, 30));
+      // Default short stay (daily / SiteMinder path); monthly stays pick longer dates
+      setInputDate(checkOutEl, addDays(cin, 3));
     }
   }
 
@@ -220,7 +260,8 @@
     params.set("items[0][children]", String(opts.children || 0));
     params.set("items[0][infants]", "0");
     if (opts.promo) params.set("promocode", opts.promo);
-    var locale = document.documentElement.lang === "zh-Hant" ? "zh_TW" : "en";
+    var loc = currentLang();
+    var locale = loc === "zh-Hans" ? "zh_CN" : (loc === "zh-Hant" ? "zh_TW" : "en");
     params.set("locale", locale);
     params.set("currency", "HKD");
     return BOOK_BASE + "?" + params.toString();
@@ -229,6 +270,132 @@
   function openBooking(opts) {
     var url = buildSiteMinderUrl(opts);
     window.open(url, "_blank", "noopener,noreferrer");
+  }
+
+  var MONTHLY_NIGHTS = 28;
+
+  function nightsBetween(dIn, dOut) {
+    return Math.round((dOut.getTime() - dIn.getTime()) / 86400000);
+  }
+
+  function buildEnquiryUrl(opts) {
+    var params = new URLSearchParams();
+    if (opts.checkIn) params.set("adate", opts.checkIn);
+    if (opts.checkOut) params.set("ddate", opts.checkOut);
+    if (opts.adults) params.set("adult", String(opts.adults));
+    if (opts.children != null && opts.children !== "") params.set("child", String(opts.children));
+    var q = params.toString();
+    return "contact.html" + (q ? "?" + q : "") + "#enquiry-form";
+  }
+
+  function goEnquiry(opts) {
+    window.location.href = buildEnquiryUrl(opts || {});
+  }
+
+  function readAvailDates(form) {
+    form = form || $("[data-avail-form]");
+    if (!form) return null;
+    var checkIn = form.querySelector('[name="checkIn"], [name="checkin"]');
+    var checkOut = form.querySelector('[name="checkOut"], [name="checkout"]');
+    var adultsEl = form.querySelector('[name="adults"]');
+    var childrenEl = form.querySelector('[name="children"]');
+    if (!checkIn || !checkOut || !checkIn.value || !checkOut.value) return null;
+    var dIn = parseISODate(checkIn.value);
+    var dOut = parseISODate(checkOut.value);
+    if (!dIn || !dOut || dOut <= dIn) return null;
+    return {
+      checkIn: checkIn.value,
+      checkOut: checkOut.value,
+      adults: adultsEl ? adultsEl.value : 2,
+      children: childrenEl ? childrenEl.value : 0,
+      nights: nightsBetween(dIn, dOut),
+      form: form
+    };
+  }
+
+  function alertInvalidDates() {
+    var l = currentLang();
+    var msg =
+      l === "zh-Hans"
+        ? "请选择有效的入住与退房日期（退房须晚于入住）。"
+        : l === "zh-Hant"
+          ? "請選擇有效的入住與退房日期（退房須晚於入住）。"
+          : "Please choose valid check-in and check-out dates (check-out must be after check-in).";
+    alert(msg);
+  }
+
+  function routeByNights(opts) {
+    if (!opts || opts.nights == null) return;
+    if (opts.nights >= MONTHLY_NIGHTS) {
+      goEnquiry(opts);
+    } else {
+      openBooking(opts);
+    }
+  }
+
+  /* ---------- Book now: daily vs monthly choice (Little Tai Hang pattern) ---------- */
+  var bookChoiceLastFocus = null;
+  var bookChoiceContext = null;
+
+  function closeBookChoice() {
+    var box = $("[data-book-choice]");
+    if (!box) return;
+    box.hidden = true;
+    document.body.classList.remove("book-choice-open");
+    bookChoiceContext = null;
+    if (bookChoiceLastFocus && bookChoiceLastFocus.focus) bookChoiceLastFocus.focus();
+  }
+
+  function openBookChoice(trigger, presetDates) {
+    var box = $("[data-book-choice]");
+    if (!box) {
+      // Fallback if modal missing: daily path
+      if (presetDates && presetDates.nights >= MONTHLY_NIGHTS) goEnquiry(presetDates);
+      else if (presetDates) openBooking(presetDates);
+      else window.open(BOOK_BASE, "_blank", "noopener,noreferrer");
+      return;
+    }
+    bookChoiceLastFocus = trigger || document.activeElement;
+    bookChoiceContext = presetDates || readAvailDates() || null;
+    box.hidden = false;
+    document.body.classList.add("book-choice-open");
+    var closeBtn = $("[data-book-choice-close]", box);
+    if (closeBtn) closeBtn.focus();
+  }
+
+  function initBookChoice() {
+    var box = $("[data-book-choice]");
+    if (!box) return;
+    $all("[data-book-choice-close]", box).forEach(function (el) {
+      el.addEventListener("click", function () { closeBookChoice(); });
+    });
+    var daily = $("[data-book-choice-daily]", box);
+    var monthly = $("[data-book-choice-monthly]", box);
+    if (daily) {
+      daily.addEventListener("click", function () {
+        var opts = bookChoiceContext || readAvailDates() || {};
+        closeBookChoice();
+        openBooking({
+          checkIn: opts.checkIn,
+          checkOut: opts.checkOut,
+          adults: opts.adults || 2,
+          children: opts.children || 0
+        });
+      });
+    }
+    if (monthly) {
+      monthly.addEventListener("click", function () {
+        var opts = bookChoiceContext || readAvailDates() || {};
+        closeBookChoice();
+        goEnquiry(opts);
+      });
+    }
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && box && !box.hidden) {
+        e.preventDefault();
+        closeBookChoice();
+      }
+    });
   }
 
   function initAvailabilityWidgets() {
@@ -248,51 +415,35 @@
         var dIn = parseISODate(cin);
         var dOut = parseISODate(cout);
         if (!dIn || !dOut || dOut <= dIn) {
-          alert(document.documentElement.lang === "zh-Hant"
-            ? "請選擇有效的入住與退房日期（退房須晚於入住）。"
-            : "Please choose valid check-in and check-out dates (check-out must be after check-in).");
+          alertInvalidDates();
           return;
         }
         var adultsEl = form.querySelector('[name="adults"]');
         var childrenEl = form.querySelector('[name="children"]');
         var promoEl = form.querySelector('[name="promocode"]');
-        openBooking({
+        var opts = {
           checkIn: cin,
           checkOut: cout,
           adults: adultsEl ? adultsEl.value : 2,
           children: childrenEl ? childrenEl.value : 0,
-          promo: promoEl && promoEl.value ? promoEl.value.trim() : ""
-        });
+          promo: promoEl && promoEl.value ? promoEl.value.trim() : "",
+          nights: nightsBetween(dIn, dOut)
+        };
+        // Booking bar: nights decide destination (no modal)
+        routeByNights(opts);
       });
     });
 
-    // Plain Book Now links without dates still go to base URL;
-    // links with data-book-now get today's defaults if desired
+    // Header / CTA Book now → daily vs monthly choice panel
     $all("[data-book-now]").forEach(function (el) {
       el.addEventListener("click", function (e) {
-        // If the link already has query params, leave it;
-        // otherwise optionally inject default month stay
+        e.preventDefault();
         var href = el.getAttribute("href") || "";
-        if (href.indexOf("checkInDate=") !== -1) return;
-        // Prefer nearest availability form dates + guests if present
-        var form = el.closest("form[data-avail-form]") || $("[data-avail-form]");
-        if (form) {
-          e.preventDefault();
-          var checkIn = form.querySelector('[name="checkIn"], [name="checkin"]');
-          var checkOut = form.querySelector('[name="checkOut"], [name="checkout"]');
-          var adultsEl = form.querySelector('[name="adults"]');
-          var childrenEl = form.querySelector('[name="children"]');
-          if (checkIn && checkOut && checkIn.value && checkOut.value) {
-            openBooking({
-              checkIn: checkIn.value,
-              checkOut: checkOut.value,
-              adults: adultsEl ? adultsEl.value : 2,
-              children: childrenEl ? childrenEl.value : 0
-            });
-            return;
-          }
+        if (href.indexOf("checkInDate=") !== -1) {
+          window.open(href, "_blank", "noopener,noreferrer");
+          return;
         }
-        // Fall through to base BOOK_BASE href
+        openBookChoice(el, readAvailDates());
       });
     });
   }
@@ -321,9 +472,28 @@
     }
     if (checkIn) checkIn.addEventListener("change", function () { setMinDates(checkIn, checkOut); });
 
+    // Prefill from ?adate=&ddate=&adult=&child= (monthly / booking-bar redirect)
+    try {
+      var qp = new URL(location.href).searchParams;
+      function fillDate(el, key) {
+        if (!el) return;
+        var v = qp.get(key);
+        if (v && parseISODate(v)) setInputDate(el, parseISODate(v));
+      }
+      fillDate(checkIn, "adate");
+      fillDate(checkOut, "ddate");
+      if (checkIn && checkOut) setMinDates(checkIn, checkOut);
+      var adultEl = form.querySelector('[name="adult"]');
+      var childEl = form.querySelector('[name="child"]');
+      if (adultEl && qp.get("adult")) adultEl.value = qp.get("adult");
+      if (childEl && qp.get("child")) childEl.value = qp.get("child");
+    } catch (err) {}
+
     form.addEventListener("submit", function (e) {
       e.preventDefault();
-      var langZh = document.documentElement.lang === "zh-Hant";
+      var lang = currentLang();
+      var langZh = lang === "zh-Hant" || lang === "zh-Hans";
+      var useHans = lang === "zh-Hans";
       var ok = true;
 
       function req(name, label) {
@@ -340,26 +510,26 @@
         return val;
       }
 
-      var firstname = req("firstname", langZh ? "名字" : "First name");
-      var lastname = req("lastname", langZh ? "姓氏" : "Last name");
-      var phone = req("phone", langZh ? "電話" : "Phone");
+      var firstname = req("firstname", useHans ? "名字" : (langZh ? "名字" : "First name"));
+      var lastname = req("lastname", useHans ? "姓氏" : (langZh ? "姓氏" : "Last name"));
+      var phone = req("phone", useHans ? "电话" : (langZh ? "電話" : "Phone"));
       var emailWrap = form.querySelector('[name="email"]').closest(".field");
       var email = (form.querySelector('[name="email"]').value || "").trim();
       if (!email || !validateEmail(email)) {
-        setFieldError(emailWrap, langZh ? "請輸入有效電郵" : "Please enter a valid email");
+        setFieldError(emailWrap, useHans ? "请输入有效电邮" : (langZh ? "請輸入有效電郵" : "Please enter a valid email"));
         ok = false;
       } else setFieldError(emailWrap, "");
 
-      var apartment = req("apartmenttype", langZh ? "公寓類型" : "Apartment type");
-      var adate = req("adate", langZh ? "預計入住日期" : "Expected arrival");
-      var ddate = req("ddate", langZh ? "預計退房日期" : "Expected departure");
+      var apartment = req("apartmenttype", useHans ? "公寓类型" : (langZh ? "公寓類型" : "Apartment type"));
+      var adate = req("adate", useHans ? "预计入住日期" : (langZh ? "預計入住日期" : "Expected arrival"));
+      var ddate = req("ddate", useHans ? "预计退房日期" : (langZh ? "預計退房日期" : "Expected departure"));
 
       if (adate && ddate) {
         var dIn = parseISODate(adate);
         var dOut = parseISODate(ddate);
         if (dIn && dOut && dOut <= dIn) {
           setFieldError(form.querySelector('[name="ddate"]').closest(".field"),
-            langZh ? "退房日期須晚於入住日期" : "Departure must be after arrival");
+            useHans ? "退房日期须晚于入住日期" : (langZh ? "退房日期須晚於入住日期" : "Departure must be after arrival"));
           ok = false;
         }
       }
@@ -510,7 +680,7 @@
     if (!el || !dataEl || !window.pannellum) return;
     var tours = JSON.parse(dataEl.textContent), viewer = null, current = null, retried = {};
     var roomsEl = $("[data-tour-rooms]");
-    function zh() { return document.documentElement.getAttribute("data-lang") === "zh"; }
+    function zh() { var k = document.documentElement.getAttribute("data-lang"); return k === "zh" || k === "zh-Hans"; }
     function label(title) { return zh() && ROOM_ZH[title] ? ROOM_ZH[title] : title; }
     function hsTooltip(div, args) {
       div.classList.add("tour-hs"); div.tabIndex = 0; div.setAttribute("role", "button");
@@ -585,6 +755,7 @@
     initLang();
     initNav();
     initCurrentNav();
+    initBookChoice();
     initAvailabilityWidgets();
     initEnquiryForm();
   });
@@ -592,6 +763,8 @@
   // Expose for debugging / README verification
   window.OneDundas = {
     buildSiteMinderUrl: buildSiteMinderUrl,
-    BOOK_BASE: BOOK_BASE
+    buildEnquiryUrl: buildEnquiryUrl,
+    BOOK_BASE: BOOK_BASE,
+    MONTHLY_NIGHTS: MONTHLY_NIGHTS
   };
 })();
