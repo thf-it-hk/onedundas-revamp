@@ -271,6 +271,26 @@ h3 { font-size: 1.45rem; }
     linear-gradient(180deg, rgba(0,0,0,.12) 0%, rgba(0,0,0,.28) 45%, rgba(0,0,0,.62) 100%);
 }
 .hero__content { position: relative; z-index: 1; padding: 5rem 0 3rem; }
+/* Compact text column — micro-scrim targets this, not full-bleed overlay */
+.hero__copy {
+  position: relative;
+  display: inline-block;
+  max-width: min(100%, 36rem);
+  padding: 1.15rem 1.5rem 1.25rem 1.15rem;
+  margin: 0 0 .15rem;
+}
+.hero__copy::before {
+  content: "";
+  position: absolute;
+  inset: -.2rem -.35rem -.25rem -.55rem;
+  z-index: -1;
+  pointer-events: none;
+  border-radius: 1.15rem;
+  /* Soft dark micro-scrim under copy only — no purple, not a solid card */
+  background:
+    radial-gradient(ellipse 85% 80% at 28% 42%, rgba(0, 0, 0, .46), rgba(0, 0, 0, .22) 52%, transparent 74%),
+    linear-gradient(105deg, rgba(0, 0, 0, .34) 0%, rgba(0, 0, 0, .16) 48%, transparent 78%);
+}
 .hero h1 { color: #fff; max-width: 16ch; }
 /* 16ch ≈ ~8 CJK glyphs and orphans the last char of short ZH titles.
    Widen for zh-Hant; keep-all + strict line-break avoid mid-phrase splits. */
@@ -281,7 +301,7 @@ html[lang="zh-Hans"] .hero h1 {
   line-break: strict;
   overflow-wrap: normal;
 }
-/* Text over photos: solid near-white + soft shadow (WCAG-ish without heavy pills) */
+/* Text over photos: multi-layer soft black shadow so white type holds on bright wood/marble */
 .text-on-photo,
 .hero .eyebrow,
 .hero h1,
@@ -289,8 +309,10 @@ html[lang="zh-Hans"] .hero h1 {
 .lightbox figcaption {
   color: #fff;
   text-shadow:
-    0 1px 2px rgba(0, 0, 0, .55),
-    0 0 18px rgba(0, 0, 0, .35);
+    0 1px 1px rgba(0, 0, 0, .82),
+    0 2px 6px rgba(0, 0, 0, .62),
+    0 4px 16px rgba(0, 0, 0, .45),
+    0 0 28px rgba(0, 0, 0, .38);
 }
 .hero .eyebrow {
   border-bottom-color: var(--accent);

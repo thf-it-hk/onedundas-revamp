@@ -479,12 +479,14 @@ index_body = f'''
 <section class="hero">
   <div class="hero__media" style="background-image:url('assets/images/hero-lobby.jpg')" role="img" aria-label="One Dundas lobby"></div>
   <div class="container hero__content">
-    <p class="eyebrow">{t("Serviced Apartments · Mongkok", "服務式公寓 · 旺角")}</p>
-    <h1>{t("Your home in the heart of Kowloon", "九龍核心的​都市居所")}</h1>
-    <p class="lead">{t("109 stylish Studio, One-Bedroom and Two-Bedroom apartments at 1 Dundas Street — steps from Mongkok’s markets, MTR and city life.", "壹登提供109間時尚開放式、單卧室及雙卧室公寓，位於登打士街1號，步行即達旺角市集、港鐵與繁華街景。")}</p>
-    <div class="btn-row">
-      <a class="btn btn--accent" href="{BOOK}" data-book-now>{t("Book Now", "立即預訂")}</a>
-      <a class="btn btn--light" href="contact.html">{t("Enquire", "立即查詢")}</a>
+    <div class="hero__copy">
+      <p class="eyebrow">{t("Serviced Apartments · Mongkok", "服務式公寓 · 旺角")}</p>
+      <h1>{t("Your home in the heart of Kowloon", "九龍核心的​都市居所")}</h1>
+      <p class="lead">{t("109 stylish Studio, One-Bedroom and Two-Bedroom apartments at 1 Dundas Street — steps from Mongkok’s markets, MTR and city life.", "壹登提供109間時尚開放式、單卧室及雙卧室公寓，位於登打士街1號，步行即達旺角市集、港鐵與繁華街景。")}</p>
+      <div class="btn-row">
+        <a class="btn btn--accent" href="{BOOK}" data-book-now>{t("Book Now", "立即預訂")}</a>
+        <a class="btn btn--light" href="contact.html">{t("Enquire", "立即查詢")}</a>
+      </div>
     </div>
     {AVAIL}
   </div>
