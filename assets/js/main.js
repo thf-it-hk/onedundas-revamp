@@ -429,8 +429,14 @@
           promo: promoEl && promoEl.value ? promoEl.value.trim() : "",
           nights: nightsBetween(dIn, dOut)
         };
-        // Booking bar: nights decide destination (no modal)
-        routeByNights(opts);
+        // Enquiry-page Quick Availability always goes to SiteMinder.
+        // Homepage / other booking bars keep the 28-night rule (<28 SiteMinder, >=28 Enquiry).
+        if (form.hasAttribute("data-force-siteminder")) {
+          openBooking(opts);
+        } else {
+          // Booking bar: nights decide destination (no modal)
+          routeByNights(opts);
+        }
       });
     });
 

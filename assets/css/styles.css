@@ -22,7 +22,7 @@
   --font: "DM Sans", "Noto Sans TC", system-ui, sans-serif;
   --display: "DM Sans", "Noto Sans TC", system-ui, sans-serif;
   --max: 1120px;
-  --header-h: 104px;
+  --header-h: 96px;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -135,6 +135,8 @@ h1, h2, h3, .display {
 h1, .display { font-size: clamp(2.45rem, 4.6vw, 3.75rem); letter-spacing: -0.02em; }
 h2 { font-size: clamp(1.9rem, 3.2vw, 2.65rem); letter-spacing: -0.015em; }
 h3 { font-size: 1.45rem; }
+/* Neighbourhood: extra space before a later group (e.g. Banks nearby) */
+h3.neighbourhood-subhead { margin-top: 2.25rem; }
 .lead { font-size: 1.15rem; color: var(--ink-muted); max-width: 48rem; }
 .muted { color: var(--ink-muted); }
 .grid-2 { display: grid; gap: 2rem; }
@@ -167,12 +169,12 @@ h3 { font-size: 1.45rem; }
   display: flex; align-items: center; gap: .65rem;
   text-decoration: none; color: inherit;
   flex-shrink: 0;
-  padding: .4rem 0;
+  padding: .4rem 0 .4rem .75rem;
   margin-right: .5rem;
 }
 .brand img {
-  width: auto; height: 88px;
-  max-width: 110px;
+  width: auto; height: 75px;
+  max-width: 94px;
   object-fit: contain;
   background: transparent;
 }
@@ -252,6 +254,11 @@ h3 { font-size: 1.45rem; }
 .btn--light { background: #fff; color: var(--purple-deep); border-color: #fff; }
 .btn--light:hover { background: #f7f2fa; color: var(--purple-dark); }
 .btn--block { width: 100%; }
+/* Enquiry Quick Availability: orange pill, white label (Winnie request; scoped, not site-wide accent) */
+.btn.btn--accent-white,
+.btn.btn--accent-white:hover {
+  color: #fff;
+}
 .btn-row { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 1.5rem; }
 
 /* Hero */
@@ -434,7 +441,10 @@ html[lang="zh-Hant"] .display {
 }
 
 .feature-list { list-style: none; padding: 0; margin: 1rem 0 0; display: grid; gap: .55rem; }
+/* Nested lists (legacy T&C markup) must not keep default disc bullets */
+.feature-list ul { list-style: none; padding: 0; margin: 0; display: grid; gap: inherit; }
 .feature-list li {
+  list-style: none;
   padding-left: 1.5rem; position: relative;
 }
 .feature-list li::before {
@@ -781,8 +791,8 @@ button[disabled][aria-busy="true"] { opacity: .7; cursor: wait; }
   .nav-actions { gap: .9rem; margin-left: .75rem; }
 }
 @media (max-width: 600px) {
-  :root { --header-h: 84px; }
-  .brand img { width: auto; height: 64px; max-width: 82px; }
+  :root { --header-h: 76px; }
+  .brand img { width: auto; height: 54px; max-width: 70px; }
 }
 
 /* Virtual tour */

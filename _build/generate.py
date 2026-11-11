@@ -340,13 +340,16 @@ def _format_terms(raw):
         # rich-text HTML from CMS — still linkify bare email if unlinked
         if "mailto:" not in s:
             s = re.sub(r"(?<![\w.>])(leasing@onedundashk\.com)", r'<a href="mailto:\1">\1</a>', s)
+        # Use ul.feature-list so T&C show orange dots only (no default disc)
+        if re.search(r"<ul\b", s, re.I) and not re.search(r"<ul[^>]*\bfeature-list\b", s, re.I):
+            s = re.sub(r"<ul\b", '<ul class="feature-list"', s, flags=re.I)
         return s
     parts = [p.strip() for p in re.split(r"\n\s*\n", s) if p.strip()]
     def linkify(chunk):
         chunk = E(chunk).replace("\n", "<br>")
         return re.sub(r"(?<![\w.>])(leasing@onedundashk\.com)", r'<a href="mailto:\1">\1</a>', chunk)
     if len(parts) >= 2:
-        return "<ul>" + "".join(f"<li>{linkify(p)}</li>" for p in parts) + "</ul>"
+        return '<ul class="feature-list">' + "".join(f"<li>{linkify(p)}</li>" for p in parts) + "</ul>"
     return f"<p>{linkify(s)}</p>"
 
 
@@ -399,7 +402,7 @@ def _promo_card(p):
     link = E(p.get("book_link") or BOOK)
     terms = ""
     if p.get("terms_en") or p.get("terms_zh"):
-        terms = f"""<div style="margin-top:2.5rem;max-width:48rem" class="feature-list">
+        terms = f"""<div style="margin-top:2.5rem;max-width:48rem">
       <h2>{t("Terms & conditions", "條款與細則")}</h2>
       {t(_format_terms(p.get("terms_en") or ""), _format_terms(p.get("terms_zh") or p.get("terms_en") or ""))}
     </div>"""
@@ -463,7 +466,8 @@ def promo_llms():
         bits = [p.get("title_en", "")]
         if p.get("code"): bits.append(f"code {p['code']}")
         if p.get("valid_until"): bits.append(f"valid until {str(p['valid_until'])[:10]}")
-        terms = " ".join(_strip(p.get("terms_en")))
+        terms_raw = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", p.get("terms_en") or "")
+        terms = " ".join(_strip(terms_raw))
         lines.append("- Current offer: " + "; ".join(bits) + (f". {terms}" if terms else ""))
     return "\n".join(lines)
 
@@ -735,18 +739,18 @@ location_body = f'''
       <p>{t("One Dundas is located in the heart of the city with an abundance of shopping, dining, entertainment and lifestyle options.", "壹登位於城市核心，購物、餐飲、娛樂與生活選擇豐富。")}</p>
       <h3>{t("Shopping & lifestyle", "購物與生活")}</h3>
       <ul class="feature-list">
-        <li>Langham Place 朗豪坊</li>
+        <li>{t("Langham Place", "朗豪坊", "朗豪坊")}</li>
         <li>{t("Ladies’ Market", "女人街")}</li>
         <li>{t("Sneakers Street", "波鞋街")}</li>
-        <li>Harbour City 海港城 · Elements 圓方 · Olympian City 奧海城</li>
+        <li>{t("Harbour City · Elements · Olympian City", "海港城 · 圓方 · 奧海城", "海港城 · 圆方 · 奥海城")}</li>
       </ul>
-      <h3>{t("Banks nearby", "附近銀行")}</h3>
+      <h3 class="neighbourhood-subhead">{t("Banks nearby", "附近銀行")}</h3>
       <ul class="feature-list">
-        <li>HSBC 匯豐銀行</li>
-        <li>Bank of China 中國銀行</li>
-        <li>Hang Seng Bank 恆生銀行</li>
-        <li>Standard Chartered Bank 渣打銀行</li>
-        <li>Bank of Communications 交通銀行</li>
+        <li>{t("HSBC", "匯豐銀行", "汇丰银行")}</li>
+        <li>{t("Bank of China", "中國銀行", "中国银行")}</li>
+        <li>{t("Hang Seng Bank", "恆生銀行", "恒生银行")}</li>
+        <li>{t("Standard Chartered Bank", "渣打銀行", "渣打银行")}</li>
+        <li>{t("Bank of Communications", "交通銀行", "交通银行")}</li>
       </ul>
     </div>
     <div>
@@ -754,10 +758,10 @@ location_body = f'''
       <h3>{t("Universities", "大專院校")}</h3>
       <p>{t("Seamless connectivity to prestigious universities:", "交通便捷，輕鬆連接多所知名院校：")}</p>
       <ul class="feature-list">
-        <li>The Hong Kong Polytechnic University 香港理工大學</li>
-        <li>City University of Hong Kong 香港城市大學</li>
-        <li>Hong Kong Baptist University 香港浸會大學</li>
-        <li>Hong Kong Metropolitan University 香港都會大學</li>
+        <li>{t("The Hong Kong Polytechnic University", "香港理工大學", "香港理工大学")}</li>
+        <li>{t("City University of Hong Kong", "香港城市大學", "香港城市大学")}</li>
+        <li>{t("Hong Kong Baptist University", "香港浸會大學", "香港浸会大学")}</li>
+        <li>{t("Hong Kong Metropolitan University", "香港都會大學", "香港都会大学")}</li>
       </ul>
     </div>
   </div>
@@ -960,23 +964,21 @@ contact_body = f'''
     </div>
     <div class="contact-stack">
       <div class="contact-item">
-        <strong>{t("Leasing (primary)", "租務（主要）")}</strong>
+        <strong>{t("Leasing Office", "租務處", "租务处")}</strong>
         <a href="tel:+85227001122">+852 2700 1122</a><br>
-        <a href="mailto:leasing@onedundashk.com">leasing@onedundashk.com</a>
+        <a href="mailto:leasing@onedundashk.com">leasing@onedundashk.com</a><br>
+        <a href="https://wa.me/85252919983" target="_blank" rel="noopener noreferrer">+852 5291 9983</a><br>
+        <span class="muted">{t("WhatsApp & WeChat", "WhatsApp 及 WeChat", "WhatsApp 及 WeChat")}</span>
       </div>
       <div class="contact-item">
         <strong>{t("Address", "地址")}</strong>
         1 Dundas Street, Mongkok, Kowloon, Hong Kong<br>
         香港九龍旺角登打士街1號
       </div>
-      <div class="contact-item">
-        <strong>{t("Book direct", "網上直訂")}</strong>
-        <p class="muted">{t("Check live availability on SiteMinder Direct.", "於 SiteMinder Direct 查詢即時空房。")}</p>
-        <a class="btn btn--accent" style="margin-top:.75rem" href="{BOOK}" data-book-now>{t("Book Now", "立即預訂")}</a>
-      </div>
       <div class="avail-bar avail-bar--stacked" style="box-shadow:none;border:1px solid var(--line);padding:1rem">
-        <p style="margin:0 0 .75rem;font-weight:700">{t("Quick availability", "快速查房")}</p>
-        <form data-avail-form>
+        <p style="margin:0 0 .35rem;font-weight:700">{t("Quick Availability", "快速查房")}</p>
+        <p class="muted" style="margin:0 0 1rem">{t("Check short stay availability and book instantly.", "查詢短租即時空房並即時預訂。", "查询短租即时空房并即时预订。")}</p>
+        <form data-avail-form data-force-siteminder>
           <div class="field">
             <label for="c-checkin">{t("Check-in", "入住")}</label>
             <input id="c-checkin" class="js-date" type="text" name="checkIn" required autocomplete="off" inputmode="none" placeholder="DD/MM/YYYY">
@@ -985,7 +987,7 @@ contact_body = f'''
             <label for="c-checkout">{t("Check-out", "退房")}</label>
             <input id="c-checkout" class="js-date" type="text" name="checkOut" required autocomplete="off" inputmode="none" placeholder="DD/MM/YYYY">
           </div>
-          <button class="btn btn--primary btn--block" type="submit">{t("Book now", "立即預訂")}</button>
+          <button class="btn btn--accent btn--block btn--accent-white" type="submit">{t("Book Now", "立即預訂")}</button>
         </form>
       </div>
     </div>
