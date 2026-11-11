@@ -709,17 +709,22 @@ button[disabled][aria-busy="true"] { opacity: .7; cursor: wait; }
 }
 .contact-item strong { display: block; color: var(--purple-deep); margin-bottom: .2rem; }
 
-.wa-link {
+.wa-link,
+.wechat-link {
   display: inline-flex;
   align-items: center;
   gap: .4rem;
   vertical-align: middle;
 }
-.wa-link svg {
+.wa-link svg,
+.wechat-link svg {
   width: 1.15em;
   height: 1.15em;
   flex-shrink: 0;
   display: block;
+}
+.wechat-link {
+  color: var(--purple-deep);
 }
 
 .site-footer {
