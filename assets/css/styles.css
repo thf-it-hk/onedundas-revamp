@@ -711,6 +711,19 @@ button[disabled][aria-busy="true"] { opacity: .7; cursor: wait; }
 }
 .contact-item strong { display: block; color: var(--purple-deep); margin-bottom: .2rem; }
 
+.wa-link {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  vertical-align: middle;
+}
+.wa-link svg {
+  width: 1.15em;
+  height: 1.15em;
+  flex-shrink: 0;
+  display: block;
+}
+
 .site-footer {
   background: var(--charcoal); color: rgba(255,255,255,.85); padding: 1.5rem 0 1rem; margin-top: 0;
   position: relative;
