@@ -493,6 +493,12 @@ html[lang="zh-Hant"] .display {
   border-radius: 28px 10px 28px 10px;
   z-index: 0;
 }
+@media (max-width: 767px) {
+  /* Keep the offset frame inside the column so it doesn't spill off-screen */
+  .why-media::before {
+    inset: 1.15rem 0 -0.65rem 0.85rem;
+  }
+}
 
 .stat-row { display: grid; gap: 1rem; grid-template-columns: repeat(2, 1fr); }
 @media (min-width: 700px) { .stat-row { grid-template-columns: repeat(4, 1fr); } }
@@ -542,7 +548,17 @@ html[lang="zh-Hant"] .display {
 }
 .promo-banner h2, .promo-banner p { color: #fff; }
 
-.table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius); }
+.table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  max-width: 100%;
+  min-width: 0;
+  position: relative;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+.grid-2, .grid-3,
+.grid-2 > *, .grid-3 > * { min-width: 0; }
 table.spec { width: 100%; border-collapse: collapse; background: #fff; }
 table.spec th, table.spec td { padding: .9rem 1rem; text-align: left; border-bottom: 1px solid var(--line); }
 table.spec th { background: var(--purple-tint); color: var(--purple-deep); font-size: .85rem; letter-spacing: .04em; text-transform: uppercase; }
@@ -562,6 +578,62 @@ table.spec--room th {
 table.spec--room td:nth-child(1) { min-width: 11.5rem; }
 table.spec--room td:nth-child(2) { min-width: 8.5rem; }
 table.spec--room td:nth-child(4) { min-width: 5.5rem; }
+/* Mobile: stack the room spec as labelled rows so it doesn't overflow the viewport */
+@media (max-width: 700px) {
+  table.spec--room { width: 100%; }
+  table.spec--room thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+  table.spec--room,
+  table.spec--room tbody,
+  table.spec--room tr {
+    display: block;
+    width: 100%;
+  }
+  table.spec--room th,
+  table.spec--room td,
+  table.spec--room td:nth-child(1),
+  table.spec--room td:nth-child(2),
+  table.spec--room td:nth-child(3),
+  table.spec--room td:nth-child(4) {
+    display: grid;
+    grid-template-columns: 7.5rem minmax(0, 1fr);
+    align-items: start;
+    gap: .75rem;
+    width: 100%;
+    min-width: 0;
+    white-space: normal;
+    box-sizing: border-box;
+  }
+  table.spec--room td::before {
+    font-weight: 700;
+    font-size: .78rem;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    color: var(--purple-deep);
+    padding-top: .15rem;
+  }
+  html[lang="en"] table.spec--room td:nth-child(1)::before { content: "Size"; }
+  html[lang="en"] table.spec--room td:nth-child(2)::before { content: "Bedding"; }
+  html[lang="en"] table.spec--room td:nth-child(3)::before { content: "Occupancy"; }
+  html[lang="en"] table.spec--room td:nth-child(4)::before { content: "Storey"; }
+  html[lang="zh-Hant"] table.spec--room td:nth-child(1)::before { content: "面積"; }
+  html[lang="zh-Hant"] table.spec--room td:nth-child(2)::before { content: "床具"; }
+  html[lang="zh-Hant"] table.spec--room td:nth-child(3)::before { content: "入住人數"; }
+  html[lang="zh-Hant"] table.spec--room td:nth-child(4)::before { content: "樓層"; }
+  html[lang="zh-Hans"] table.spec--room td:nth-child(1)::before { content: "面积"; }
+  html[lang="zh-Hans"] table.spec--room td:nth-child(2)::before { content: "床具"; }
+  html[lang="zh-Hans"] table.spec--room td:nth-child(3)::before { content: "入住人数"; }
+  html[lang="zh-Hans"] table.spec--room td:nth-child(4)::before { content: "楼层"; }
+}
 
 .gallery-grid {
   display: grid; gap: .75rem;
