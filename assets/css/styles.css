@@ -684,6 +684,48 @@ table.spec--room td:nth-child(4) { min-width: 5.5rem; }
   background: var(--purple-tint); color: var(--purple-deep);
   border-radius: 999px; padding: .4rem .85rem; font-weight: 600; font-size: .9rem;
 }
+/* Mobile: equal 3-column jump bar so room shortcuts don't wrap 2+1 */
+@media (max-width: 800px) {
+  .page-hero .pill-list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0;
+    margin: 1.15rem 0 0;
+    background: #fff;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 1px 0 rgba(46, 16, 70, .06);
+  }
+  .page-hero .pill-list li {
+    background: transparent;
+    border-radius: 0;
+    padding: 0;
+    min-width: 0;
+    border-right: 1px solid var(--line);
+    font-size: .78rem;
+    line-height: 1.25;
+  }
+  .page-hero .pill-list li:last-child { border-right: 0; }
+  .page-hero .pill-list a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 3.15rem;
+    padding: .7rem .4rem;
+    text-align: center;
+    text-decoration: none;
+    color: inherit;
+    box-sizing: border-box;
+  }
+  .page-hero .pill-list a:hover {
+    background: var(--purple-tint);
+  }
+  .page-hero .pill-list a:focus-visible {
+    outline: 2px solid var(--purple);
+    outline-offset: -2px;
+  }
+}
 
 .page-hero {
   background: var(--purple-tint);
