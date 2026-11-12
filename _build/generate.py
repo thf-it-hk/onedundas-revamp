@@ -564,7 +564,7 @@ index_body = f'''
     <div class="stat-row">
       <div class="stat"><strong>109</strong><span>{t("Apartments", "公寓單位")}</span></div>
       <div class="stat"><strong>3</strong><span>{t("Apartment types", "房型選擇")}</span></div>
-      <div class="stat"><strong>{t("~8 min", "約8分鐘", "约8分钟")}</strong><span>{t("to Mongkok MTR*", "至旺角站*")}</span></div>
+      <div class="stat"><strong>{t("~8 min", "~8分鐘", "~8分钟")}</strong><span>{t("to Mongkok MTR*", "至旺角站*")}</span></div>
       <div class="stat"><strong>24/7</strong><span>{t("Concierge & security", "禮賓與保安")}</span></div>
     </div>
     <p class="muted" style="margin-top:1rem;font-size:.85rem">* {t("Walking time estimates vary by exit and traffic.", "步行時間因出口與路況而異。")}</p>
@@ -722,11 +722,11 @@ location_body = f'''
       <table class="spec">
         <thead><tr><th>{t("Destination", "目的地")}</th><th>{t("Approx. time", "約需時間")}</th></tr></thead>
         <tbody>
-          <tr><td>{t("Mongkok MTR Exit E1 / Langham Place", "旺角站 E1 出口／朗豪坊")}</td><td>{t("~8 min walk", "步行約8分鐘", "步行约8分钟")}</td></tr>
-          <tr><td>{t("Yau Ma Tei MTR Exit A1", "油麻地站 A1 出口")}</td><td>{t("~6 min walk", "步行約6分鐘", "步行约6分钟")}</td></tr>
-          <tr><td>{t("Olympic MTR / Olympian City", "奧運站／奧海城")}</td><td>{t("~10 min", "約10分鐘", "约10分钟")}</td></tr>
-          <tr><td>{t("Kowloon MTR / ICC / Elements", "九龍站／環球貿易廣場／圓方")}</td><td>{t("~10 min", "約10分鐘", "约10分钟")}</td></tr>
-          <tr><td>{t("Harbour City / Canton Road", "海港城／廣東道")}</td><td>{t("~10 min", "約10分鐘", "约10分钟")}</td></tr>
+          <tr><td>{t("Mongkok MTR Exit E1 / Langham Place", "旺角站 E1 出口／朗豪坊")}</td><td>{t("~8 min walk", "步行~8分鐘", "步行~8分钟")}</td></tr>
+          <tr><td>{t("Yau Ma Tei MTR Exit A1", "油麻地站 A1 出口")}</td><td>{t("~6 min walk", "步行~6分鐘", "步行~6分钟")}</td></tr>
+          <tr><td>{t("Olympic MTR / Olympian City", "奧運站／奧海城")}</td><td>{t("~10 min", "~10分鐘", "~10分钟")}</td></tr>
+          <tr><td>{t("Kowloon MTR / ICC / Elements", "九龍站／環球貿易廣場／圓方")}</td><td>{t("~10 min", "~10分鐘", "~10分钟")}</td></tr>
+          <tr><td>{t("Harbour City / Canton Road", "海港城／廣東道")}</td><td>{t("~10 min", "~10分鐘", "~10分钟")}</td></tr>
         </tbody>
       </table>
     </div>
