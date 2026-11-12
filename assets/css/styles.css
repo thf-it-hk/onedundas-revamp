@@ -501,13 +501,14 @@ html[lang="zh-Hant"] .display {
   text-align: center;
 }
 .stat strong { display: block; font-family: var(--display); font-size: 1.8rem; color: var(--purple-deep); }
-.stat span { font-size: .9rem; color: var(--ink-muted); }
+.stat strong span { font-size: inherit; font-family: inherit; font-weight: inherit; color: inherit; }
+.stat > span { font-size: .9rem; color: var(--ink-muted); }
 .section--charcoal .stat {
   background: rgba(255,255,255,.06);
   border: 1px solid rgba(255,255,255,.1);
 }
 .section--charcoal .stat strong { color: #fff; }
-.section--charcoal .stat span { color: rgba(255,255,255,.65); }
+.section--charcoal .stat > span { color: rgba(255,255,255,.65); }
 
 /* Breathing room between homepage hero and early-bird promo */
 .section--after-hero {
