@@ -564,7 +564,7 @@ index_body = f'''
     <div class="stat-row">
       <div class="stat"><strong>109</strong><span>{t("Apartments", "公寓單位")}</span></div>
       <div class="stat"><strong>3</strong><span>{t("Apartment types", "房型選擇")}</span></div>
-      <div class="stat"><strong>~2 min</strong><span>{t("to Mongkok MTR*", "至旺角站*")}</span></div>
+      <div class="stat"><strong>~8 min</strong><span>{t("to Mongkok MTR*", "至旺角站*")}</span></div>
       <div class="stat"><strong>24/7</strong><span>{t("Concierge & security", "禮賓與保安")}</span></div>
     </div>
     <p class="muted" style="margin-top:1rem;font-size:.85rem">* {t("Walking time estimates vary by exit and traffic.", "步行時間因出口與路況而異。")}</p>
