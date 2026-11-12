@@ -726,7 +726,8 @@ table.spec--room td:nth-child(4) { min-width: 5.5rem; }
     box-sizing: border-box;
   }
   .page-hero .pill-list a:hover {
-    background: var(--purple-tint);
+    background: #eee6f0;
+    background: color-mix(in srgb, var(--purple-deep) 10%, #fff);
   }
   .page-hero .pill-list a:focus-visible {
     outline: 2px solid var(--purple);
