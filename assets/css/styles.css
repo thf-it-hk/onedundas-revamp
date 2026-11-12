@@ -941,6 +941,31 @@ button[disabled][aria-busy="true"] { opacity: .7; cursor: wait; }
   padding: .6rem 1.1rem; border-radius: 999px; font-weight: 700; cursor: pointer; font: inherit; font-weight: 700;
 }
 .tour-tab[aria-selected="true"] { background: var(--purple-deep); color: #fff; border-color: var(--purple-deep); }
+/* Mobile: equal 2-column grid so the five apartment types don't wrap raggedly */
+@media (max-width: 800px) {
+  .tour-tabs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: stretch;
+    gap: .5rem;
+  }
+  .tour-tab {
+    width: 100%;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    align-self: stretch;
+    text-align: center;
+    white-space: normal;
+    line-height: 1.25;
+    padding: .6rem .45rem;
+    border-radius: 12px;
+    box-sizing: border-box;
+    min-height: 3rem;
+    font-size: .92rem;
+  }
+}
 .tour-viewer {
   width: 100%; height: min(70vh, 640px); min-height: 360px;
   border-radius: 14px; overflow: hidden;
