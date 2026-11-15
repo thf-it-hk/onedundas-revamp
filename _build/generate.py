@@ -12,7 +12,7 @@ OG_IMAGE = "assets/images/exterior-day.jpg"
 WEB3FORMS_ACCESS_KEY = "0ca60608-4cab-4d0d-91c8-55cbe55573c1"
 WEB3FORMS_ENDPOINT = "https://api.web3forms.com/submit"
 # No-JS fallback redirect after POST. Update to SITE_URL + "contact.html#thank-you" at DNS cutover.
-ENQUIRY_REDIRECT = "https://thf-it-hk.github.io/onedundas-revamp/contact.html#thank-you"
+ENQUIRY_REDIRECT = "https://onedundashk.com/contact.html#thank-you"
 import re
 try:
     from PIL import Image
