@@ -72,34 +72,6 @@
     refreshFlatpickrLocales();
   }
 
-  function prefersLangFromSystem() {
-    var list = [];
-    try {
-      if (navigator.languages && navigator.languages.length) {
-        list = Array.prototype.slice.call(navigator.languages);
-      } else if (navigator.language) {
-        list = [navigator.language];
-      }
-    } catch (e) {}
-    for (var i = 0; i < list.length; i++) {
-      var raw = String(list[i] || "").toLowerCase().replace(/_/g, "-");
-      if (!raw) continue;
-      if (raw.indexOf("zh-cn") === 0 || raw.indexOf("zh-hans") === 0 || raw.indexOf("zh-sg") === 0) {
-        return "zh-Hans";
-      }
-      if (
-        raw === "zh" ||
-        raw.indexOf("zh-hk") === 0 ||
-        raw.indexOf("zh-tw") === 0 ||
-        raw.indexOf("zh-hant") === 0 ||
-        raw.indexOf("zh-mo") === 0
-      ) {
-        return "zh-Hant";
-      }
-    }
-    return "en";
-  }
-
   function initLang() {
     var saved = null;
     var fromQuery = null;
@@ -114,7 +86,8 @@
     } else if (saved === "en" || saved === "zh-Hant" || saved === "zh-Hans" || saved === "zh") {
       initial = normalizeLang(saved);
     } else {
-      initial = prefersLangFromSystem();
+      // Default to English; honour ?lang= and a saved language-switcher choice only.
+      initial = "en";
     }
     applyLang(initial);
     $all("[data-lang-btn]").forEach(function (btn) {
